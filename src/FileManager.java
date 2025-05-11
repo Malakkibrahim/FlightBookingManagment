@@ -18,7 +18,6 @@ public class FileManager {
         }
     }
 
-
     public static List<Administrator> loadAdminsFromFile() {
         List<Administrator> admins = new ArrayList<>();
         File file = new File(ADMIN_FILE);
@@ -59,7 +58,7 @@ public class FileManager {
             writer.newLine();
             System.out.println("✅ Agent saved successfully.");
         } catch (IOException e) {
-            System.out.println("❌ Error saving Agent: " + e.getMessage());
+            System.out.println("❌ Error saving agent: " + e.getMessage());
         }
     }
 
@@ -98,9 +97,14 @@ public class FileManager {
         return agents;
     }
 
-
     public void saveFlightToFile(Flight flight){
-
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FLIGHT_FILE, true))) {
+            writer.write(flight.toString());
+            writer.newLine();
+            System.out.println("✅ Flight saved successfully.");
+        } catch (IOException e) {
+            System.out.println("❌ Error saving flight: " + e.getMessage());
+        }
     }
 
     public void removeFlightFromFile( String flightNumber){
@@ -109,10 +113,10 @@ public class FileManager {
 
     public static List<Flight> loadFlightFromFile() {
         List<Flight> flights = new ArrayList<>();
-        File file = new File(Flight_FILE);
+        File file = new File(FLIGHT_FILE);
 
         if (!file.exists()) {
-            return flights; // لو الملف مش موجود بيرجع ليست فاضية
+            return flights;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -131,14 +135,14 @@ public class FileManager {
                     String contactinfo = data[8];
                     Role role = Role.valueOf(data[9]);
 
-                    flights.add(new Flight( depart, commision, userid,  username,  password,  name,  email,  contactinfo,  role,  agentId));
+                    flights.add();
                 }
             }
         } catch (IOException e) {
             System.out.println("❌ Error reading agent file: " + e.getMessage());
         }
 
-        return agents;
+        return flights;
     }
 
     public static void savePayments(List<Payment> payments , String PAYMENTS_FILE) {

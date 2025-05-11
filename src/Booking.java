@@ -360,44 +360,43 @@ public class Booking {
         }
     }
 
-
     public boolean confirmBooking() {
-            // 1. شوف حالة الحجز والدفع
-            if (this.status.equalsIgnoreCase("Reserved") && this.paymentStatus.equalsIgnoreCase("Paid")) {
-                String flightnumber = this.flight.getFlightnumber();
-                int numberOfPassengers = this.passengers.size();
-                String passengerNames = "";
-                for (Passenger passenger : this.passengers) {
-                    passengerNames += passenger.getpassengerName() + ", "; // نفترض إن كلاس Passenger فيه ميثود getName()
-                }
-                if (!passengerNames.isEmpty()) {
-                    passengerNames = passengerNames.substring(0, passengerNames.length() - 2); // إزالة الفاصلة الأخيرة
-                }
+        // 1. شوف حالة الحجز والدفع
+        if (this.status.equalsIgnoreCase("Reserved") && this.paymentStatus.equalsIgnoreCase("Paid")) {
+            String flightnumber = this.flight.getFlightnumber();
+            int numberOfPassengers = this.passengers.size();
+            String passengerNames = "";
+            for (Passenger passenger : this.passengers) {
+                passengerNames += passenger.getpassengerName() + ", "; // نفترض إن كلاس Passenger فيه ميثود getName()
+            }
+            if (!passengerNames.isEmpty()) {
+                passengerNames = passengerNames.substring(0, passengerNames.length() - 2); // إزالة الفاصلة الأخيرة
+            }
 
-                boolean flightupdate= flight.getAvailableSeats(flightnumber, numberOfPassengers, true); // true يعني نقص
-                boolean bookingAdded = addBookingAvailability();
+            boolean flightupdate= flight.getAvailableSeats(flightnumber, numberOfPassengers, true); // true يعني نقص
+            boolean bookingAdded = addBookingAvailability();
 
-                if (flightupdate && bookingAdded) {
-                    System.out.println("تم تأكيد الحجز بنجاح!");
-                    System.out.println("رقم مرجع الحجز: " + this.bookingReference);
-                    System.out.println("المسافرون: " + passengerNames);
-                    System.out.println("رقم الرحلة: " + flightnumber);
-                    return true;
-                } else {
-                    System.out.println("حدث خطأ أثناء تحديث بيانات الرحلة أو إضافة سجل الحجز.");
-                    return false;
-                }
+            if (flightupdate && bookingAdded) {
+                System.out.println("تم تأكيد الحجز بنجاح!");
+                System.out.println("رقم مرجع الحجز: " + this.bookingReference);
+                System.out.println("المسافرون: " + passengerNames);
+                System.out.println("رقم الرحلة: " + flightnumber);
+                return true;
             } else {
-                System.out.println("لا يمكن تأكيد الحجز. حالة الحجز: " + this.status + "، حالة الدفع: " + this.paymentStatus + ". يجب أن يكون الحجز 'Reserved' والدفع 'Paid'.");
+                System.out.println("حدث خطأ أثناء تحديث بيانات الرحلة أو إضافة سجل الحجز.");
                 return false;
             }
+        } else {
+            System.out.println("لا يمكن تأكيد الحجز. حالة الحجز: " + this.status + "، حالة الدفع: " + this.paymentStatus + ". يجب أن يكون الحجز 'Reserved' والدفع 'Paid'.");
+            return false;
         }
+    }
 
 
-        public void cancelBooking()
-        {
+    public void cancelBooking()
+    {
 
-        }
+    }
 
         public String generateItinerary()
         {

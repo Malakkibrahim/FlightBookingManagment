@@ -6,293 +6,149 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Flight {
-    private String Flightnumber;
-    private String seatClass;
-    private String Airline;
-    private String Origin;
-    private String Destination;
-    private LocalDateTime DepartureTime;
-    private LocalDateTime ArrivalTime;
-    private int availableEconomySeats;
-    private int availableBusinessSeats;
-    private int availableFirstClassSeats;
-    private int bookedEconomySeats;
-    private int bookedBusinessSeats;
-    private int bookedFirstClassSeats;
-    private double economyPrice;
-    private double businessPrice;
-    private double FirstClassPrice;
-   private String classType;
-    private int  seatsToBook;
+    private String flightNumber;
+    private String airline;
+    private String origin;
+    private String destination;
+    private LocalDateTime departureTime;
+    private LocalDateTime arrivalTime;
+    private FlightSeat economyFilghtSeats;
+    private FlightSeat businessFilghtSeats;
+    private FlightSeat firstClassFilghtSeats;
 
-   static String filePath = "flights.txt";
-    public Flight(String Flightno, String airline, String origin, String destination, LocalDateTime departureTime, LocalDateTime arrivalTime) {
-        super();
-        this.Flightnumber = Flightno;
-        this.Airline = airline;
-        this.Origin = origin;
-        this.Destination = destination;
-        this.DepartureTime = departureTime;
-        this.ArrivalTime = arrivalTime;
-
+    public Flight(String flightNumber, String airline, String origin, String destination, 
+    LocalDateTime departureTime, LocalDateTime arrivalTime) {
+        this.flightNumber = flightNumber;
+        this.airline = airline;
+        this.origin = origin;
+        this.destination = destination;
+        this.departureTime = departureTime;
+        this.arrivalTime = arrivalTime;
     }
 
-    public Flight( String airline,LocalDateTime arrivalTime, int availableBusinessSeats, int availableEconomySeats, int availableFirstClassSeats, int bookedBusinessSeats, int bookedEconomySeats, int bookedFirstClassSeats, double businessPrice, LocalDateTime departureTime, String destination, double economyPrice, double firstClassPrice, String flightnumber, String origin) {
-
-        Airline = airline;
-        ArrivalTime = arrivalTime;
-        this.availableBusinessSeats = availableBusinessSeats;
-        this.availableEconomySeats = availableEconomySeats;
-        this.availableFirstClassSeats = availableFirstClassSeats;
-        this.bookedBusinessSeats = bookedBusinessSeats;
-        this.bookedEconomySeats = bookedEconomySeats;
-        this.bookedFirstClassSeats = bookedFirstClassSeats;
-        this.businessPrice = businessPrice;
-        DepartureTime = departureTime;
-        Destination = destination;
-        this.economyPrice = economyPrice;
-        FirstClassPrice = firstClassPrice;
-        Flightnumber = flightnumber;
-        Origin = origin;
+    public Flight(String flightNumber, String airline, String origin, String destination, 
+    LocalDateTime departureTime, LocalDateTime arrivalTime,
+    int availableEconomySeats, int bookedEconomySeats, double economyPrice, 
+    int availableBusinessSeats, int bookedBusinessSeats, double businessPrice,
+    int availableFirstClassSeats,  int bookedFirstClassSeats,  double firstClassPrice) {
+        this(flightNumber, airline, origin, destination, departureTime, arrivalTime);
+        this.economyFilghtSeats = new FlightSeat(SeatClass.Economy, economyPrice, availableEconomySeats, bookedEconomySeats);
+        this.businessFilghtSeats = new FlightSeat(SeatClass.Business, businessPrice, availableBusinessSeats, bookedBusinessSeats);
+        this.firstClassFilghtSeats = new FlightSeat(SeatClass.FIrstClass, firstClassPrice, availableFirstClassSeats, bookedFirstClassSeats);
     }
-
-    public Flight(String flightNumber, String seatClass, String airline, String origin, String destination,
-                  LocalDateTime departureTime, LocalDateTime arrivalTime,
-                  int availableEconomySeats, int availableBusinessSeats, int availableFirstClassSeats,
-                  int bookedEconomySeats, int bookedBusinessSeats, int bookedFirstClassSeats,
-                  double economyPrice, double businessPrice, double firstClassPrice) {
-
-        this.Flightnumber = flightNumber;
-        this.seatClass = seatClass;
-        this.Airline = airline;
-        this.Origin = origin;
-        this.Destination = destination;
-        this.DepartureTime = departureTime;
-        this.ArrivalTime = arrivalTime;
-        this.availableEconomySeats = availableEconomySeats;
-        this.availableBusinessSeats = availableBusinessSeats;
-        this.availableFirstClassSeats = availableFirstClassSeats;
-        this.bookedEconomySeats = bookedEconomySeats;
-        this.bookedBusinessSeats = bookedBusinessSeats;
-        this.bookedFirstClassSeats = bookedFirstClassSeats;
-        this.economyPrice = economyPrice;
-        this.businessPrice = businessPrice;
-        this.FirstClassPrice = firstClassPrice;
-    }
-
-    public Flight() {
-        // Constructor افتراضي لا يعمل شيء
-    }
-
 
     public void setDepartureTime(LocalDateTime departureTime) {
-        this.DepartureTime = departureTime;
+        this.departureTime = departureTime;
     }
 
-    public void setFlightnumber(String flightnumber) {
-        Flightnumber = flightnumber;
+    public void setFlightNumber(String flightNumber) {
+        this.flightNumber = flightNumber;
     }
 
     public void setArrivalTime(LocalDateTime arrivalTime) {
-        this.ArrivalTime = arrivalTime;
-    }
-
-    public void setAvailableBusinessSeats(int availableBusinessSeats) {
-        this.availableBusinessSeats = availableBusinessSeats;
+        this.arrivalTime = arrivalTime;
     }
 
     public void setAirline(String airline) {
-        Airline = airline;
-    }
-
-    public void setBookedBusinessSeats(int bookedBusinessSeats) {
-        this.bookedBusinessSeats = bookedBusinessSeats;
-    }
-
-    public void setBookedEconomySeats(int bookedEconomySeats) {
-        this.bookedEconomySeats = bookedEconomySeats;
-    }
-
-    public void setBookedFirstClassSeats(int bookedFirstClassSeats) {
-        this.bookedFirstClassSeats = bookedFirstClassSeats;
-    }
-
-    public void setBusinessPrice(double businessPrice) {
-        this.businessPrice = businessPrice;
+        this.airline = airline;
     }
 
     public void setDestination(String destination) {
-        Destination = destination;
-    }
-
-    public void setEconomyPrice(double economyPrice) {
-        this.economyPrice = economyPrice;
-    }
-
-    public void setFirstClassPrice(double firstClassPrice) {
-        FirstClassPrice = firstClassPrice;
+        this.destination = destination;
     }
 
     public void setOrigin(String origin) {
-        Origin = origin;
+        this.origin = origin;
     }
 
-    public void setSeatClass(String seatClass) {
-        this.seatClass = seatClass;
+    public void setEconomyPrice(double price) {
+        if(price < 0)
+            System.out.println("Neagtive value not allowed");
+        else:
+            this.price = price;
     }
 
-    public void setAvailableEconomySeats(int availableEconomySeats) {
-        this.availableEconomySeats = availableEconomySeats;
+    public void setAvailableEconomySeats(int available) {
+        if(available < 0)
+            System.out.println("Neagtive value not allowed");
+        else
+            economyFilghtSeats.available = available;
+    }
+    
+    public void setBookedEconomySeats(int booked) {
+        if(booked < 0)
+            System.out.println("Neagtive value not allowed");
+        else
+            economyFilghtSeats.booked = booked;
     }
 
-    public void setAvailableFirstClassSeats(int availableFirstClassSeats) {
-        this.availableFirstClassSeats = availableFirstClassSeats;
+    public void setBusinessPrice(double price) {
+        if(price < 0)
+            System.out.println("Neagtive value not allowed");
+        else:
+            businessFilghtSeats.price = price;
     }
 
+    public void setAvailableBusinessSeats(int available) {
+        if(available < 0)
+            System.out.println("Neagtive value not allowed");
+        else
+            businessFilghtSeats.available = available;
+    }
+    
+    public void setBookedBusinessSeats(int booked) {
+        if(booked < 0)
+            System.out.println("Neagtive value not allowed");
+        else
+            businessFilghtSeats.booked = booked;
+    }
+
+    public void setFirstClassPrice(double price) {
+        if(price < 0)
+            System.out.println("Neagtive value not allowed");
+        else
+            firstClassFilghtSeats.price = price;
+    }
+
+    public void setAvailableFirstClassSeats(int available) {
+        if(available < 0)
+            System.out.println("Neagtive value not allowed");
+        else
+            firstClassFilghtSeats.available = available;
+    }
+    
+    public void setBookedFirstClassSeats(int booked) {
+        if(booked < 0)
+            System.out.println("Neagtive value not allowed");
+        else
+            firstClassFilghtSeats.booked = booked;
+    }
+    
     public String getAirline() {
-        return Airline;
+        return airline;
     }
 
     public LocalDateTime getArrivalTime() {
-        return ArrivalTime;
-    }
-
-    public int getAvailableBusinessSeats() {
-        return availableBusinessSeats;
-    }
-
-    public int getAvailableEconomySeats() {
-        return availableEconomySeats;
-    }
-
-    public int getAvailableFirstClassSeats() {
-        return availableFirstClassSeats;
-    }
-
-    public int getBookedBusinessSeats() {
-        return bookedBusinessSeats;
-    }
-
-    public int getBookedEconomySeats() {
-        return bookedEconomySeats;
-    }
-
-    public int getBookedFirstClassSeats() {
-        return bookedFirstClassSeats;
-    }
-
-    public double getBusinessPrice() {
-        return businessPrice;
+        return arrivalTime;
     }
 
     public LocalDateTime getDepartureTime() {
-        return DepartureTime;
+        return departureTime;
     }
 
     public String getDestination() {
-        return Destination;
+        return destination;
     }
 
-    public double getEconomyPrice() {
-        return economyPrice;
-    }
-
-    public double getFirstClassPrice() {
-        return FirstClassPrice;
-    }
-
-    public String getFlightnumber() {
-        return Flightnumber;
+    public String getFlightNumber() {
+        return flightNumber;
     }
 
     public String getOrigin() {
-        return Origin;
+        return origin;
     }
 
-    public void increaseEconomySeats() {
-        availableEconomySeats++;
-    }
-
-    public void increaseBusinessSeats() {
-        availableBusinessSeats++;
-    }
-
-    public void increaseFirstClassSeats() {
-        availableFirstClassSeats++;
-    }
-
-    public void saveToFile() {
-        File file = new File(filePath);
-        List<Flight> existingFlights = new ArrayList<>();
-
-        // Step 1: قراءة الرحلات الموجودة
-        if (file.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    existingFlights.add(Flight.fromFileString(line));
-                }
-            } catch (IOException e) {
-                System.out.println("❌ Error reading flights: " + e.getMessage());
-                return;
-            }
-        }
-
-        // Step 2: التأكد إن رقم الرحلة مش موجود
-        for (Flight f : existingFlights) {
-            if (f.getFlightnumber().equalsIgnoreCase(this.Flightnumber)) {
-                System.out.println("⚠️ Flight with number " + this.Flightnumber + " already exists!");
-                return;
-            }
-        }
-
-        // Step 3: إضافة الرحلة للملف
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            writer.write(this.toFileString());
-            writer.newLine();
-            System.out.println("✅ Flight saved successfully.");
-        } catch (IOException e) {
-            System.out.println("❌ Error writing flight: " + e.getMessage());
-        }
-    }
-
-    public static Flight fromFileString(String line) {
-        String[] parts = line.split(",");
-        if (parts.length < 16) {
-            throw new IllegalArgumentException("Invalid flight record: " + line);
-        }
-
-        return new Flight(
-                parts[0].trim(),  // Flightnumber
-                parts[1].trim(),  // seatClass
-                parts[2].trim(),  // Airline
-                parts[3].trim(),  // Origin
-                parts[4].trim(),  // Destination
-                LocalDateTime.parse(parts[5].trim()),
-                LocalDateTime.parse(parts[6].trim()),
-                Integer.parseInt(parts[7].trim()),  // availableEconomySeats
-                Integer.parseInt(parts[8].trim()),  // availableBusinessSeats
-                Integer.parseInt(parts[9].trim()),  // availableFirstClassSeats
-                Integer.parseInt(parts[10].trim()), // bookedEconomySeats
-                Integer.parseInt(parts[11].trim()), // bookedBusinessSeats
-                Integer.parseInt(parts[12].trim()), // bookedFirstClassSeats
-                Double.parseDouble(parts[13].trim()), // economyPrice
-                Double.parseDouble(parts[14].trim()), // businessPrice
-                Double.parseDouble(parts[15].trim())  // FirstClassPrice
-        );
-    }
-
-
-
-
-
-
-    public boolean getAvailableSeats(String flightNumber, int numberOfSeats, boolean decrease) {
-        if (!this.Flightnumber.equals(flightNumber)) {
-            System.out.println("رقم الرحلة غير متطابق.");
-            return false;
-        }
-
+    public boolean getAvailableSeats(int numberOfSeats, boolean decrease) {
         // تحديد نوع الكرسي
         String seatClass = this.seatClass; // تأكد إنك عندك seatClass معرفة في Flight
         if (seatClass.equalsIgnoreCase("Economy")) {
@@ -327,72 +183,23 @@ public class Flight {
         }
     }
 
-
-    public void SHOWMENU(){
-    Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Calc Price...");
-        System.out.println("Update Schedule...");
-        System.out.println("Reserve Seat....");
-        System.out.println("Check Availability....");
-        int Ekhtarrkm = scanner.nextInt();
-        switch (Ekhtarrkm) {
-            case 1:
-        CalcPrice();
-        break;
-            case 2:
-                updateScheduleInFile(filePath);
-                break;
-            case 3:
-                ReserveSeat(String classType, int seatsToBook);
-                break;
-            case 4:
-                CheckAvailability(filePath);
-                break;
+    public double calcPrice(SeatClass seatClass, int quantity) {
+        switch (seatClass) {
+            case Economy:
+                return economyFilghtSeats.price * quantity;
+            case Business:
+                return businessFilghtSeats.price * quantity;
+            case FirstClass:
+                return firstClassFilghtSeats.price * quantity;
             default:
-                System.out.println("Invalid rkm ya ngm");
-                SHOWMENU();
-                break;
-
+                throw new IllegalArgumentException("This seat type is not supported");
         }
-}
-    public double CalcPrice(){
-        Scanner scanner = new Scanner(System.in);
-
-        // طلب نوع المقعد والتأكد من صحته
-        String Classtype;
-        while (true) {
-            System.out.println("Enter a ClassType (economy, business, or first class):");
-            Classtype = scanner.nextLine().trim().toLowerCase();  // تحويل الحروف إلى صغيرة لإزالة تأثير الحروف الكبيرة والصغيرة
-
-            // التحقق من صحة نوع المقعد المدخل
-            if (Classtype.equals("economy") || Classtype.equals("business") || Classtype.equals("first class")) {
-                break;  // إذا كان النوع صحيحًا، نخرج من الحلقة
-            } else {
-                System.out.println("Invalid class type. Please enter 'economy', 'business', or 'first class'.");
-            }
-        }
-
-        // طلب الكمية
-        System.out.println("Enter a Quantity:");
-        int Quantity = scanner.nextInt();
-
-        // حساب السعر بناءً على نوع المقعد
-        if (Classtype.equals("economy")) {
-            return economyPrice * Quantity;
-        } else if (Classtype.equals("business")) {
-            return businessPrice * Quantity;
-        } else if (Classtype.equals("first class")) {
-            return FirstClassPrice * Quantity;
-        }
-
-        return -1;  // في حال كان هناك خطأ آخر
     }
 
     public String toFileString() {
         return String.join(",",
-                Flightnumber, Airline, Origin, Destination,
-                DepartureTime.toString(), ArrivalTime.toString(),
+                flightNumber, airline, origin, destination,
+                departureTime.toString(), arrivalTime.toString(),
                 String.valueOf(availableEconomySeats), String.valueOf(availableBusinessSeats), String.valueOf(availableFirstClassSeats),
                  String.valueOf(bookedEconomySeats), String.valueOf(bookedBusinessSeats), String.valueOf(bookedFirstClassSeats)
                 ,String.valueOf(economyPrice), String.valueOf(businessPrice),
@@ -405,13 +212,13 @@ public class Flight {
         String[] parts = line.split(",");
         if (parts.length == 16) {
             Flight flight = new Flight();
-            flight.setFlightnumber(parts[0]);
+            flight.setflightNumber(parts[0]);
             flight.setSeatClass(parts[1]);
-            flight.setAirline(parts[2]);
-            flight.setOrigin(parts[3]);
-            flight.setDestination(parts[4]);
-            flight.setDepartureTime(LocalDateTime.parse(parts[5]));
-            flight.setArrivalTime(LocalDateTime.parse(parts[6]));
+            flight.setairline(parts[2]);
+            flight.setorigin(parts[3]);
+            flight.setdestination(parts[4]);
+            flight.setdepartureTime(LocalDateTime.parse(parts[5]));
+            flight.setarrivalTime(LocalDateTime.parse(parts[6]));
             flight.setAvailableEconomySeats(Integer.parseInt(parts[7]));
             flight.setAvailableBusinessSeats(Integer.parseInt(parts[8]));
             flight.setAvailableFirstClassSeats(Integer.parseInt(parts[9]));
@@ -437,7 +244,7 @@ public class Flight {
         try {
             // 1. خدي رقم الرحلة من المستخدم
             System.out.print("🔍 Enter flight number to update: ");
-            String targetFlightNumber = scanner.nextLine().trim();
+            String targetflightNumber = scanner.nextLine().trim();
 
             // 2. اقرأ الرحلات من الملف
             List<Flight> flights = new ArrayList<>();
@@ -447,7 +254,7 @@ public class Flight {
                 while ((line = reader.readLine()) != null) {
                     Flight flight = Flight.FromFileString(line);
                     flights.add(flight);
-                    if (flight.getFlightnumber().equalsIgnoreCase(targetFlightNumber)) {
+                    if (flight.getflightNumber().equalsIgnoreCase(targetflightNumber)) {
                         flightExists = true; // إذا كانت الرحلة موجودة في الملف
                     }
                 }
@@ -478,9 +285,9 @@ public class Flight {
             // 4. عدل الرحلة المطلوبة
             boolean updated = false;
             for (Flight f : flights) {
-                if (f.getFlightnumber().equalsIgnoreCase(targetFlightNumber)) {
-                    f.setDepartureTime(newDeparture);
-                    f.setArrivalTime(newArrival);
+                if (f.getflightNumber().equalsIgnoreCase(targetflightNumber)) {
+                    f.setdepartureTime(newDeparture);
+                    f.setarrivalTime(newArrival);
                     updated = true;
                     break;
                 }
@@ -508,7 +315,7 @@ public class Flight {
 
         // 1. اسأل المستخدم عن رقم الرحلة والفئة
         System.out.print("🔍 Enter flight number to check availability: ");
-        String targetFlightNumber = scanner.nextLine().trim();
+        String targetflightNumber = scanner.nextLine().trim();
 
         System.out.print("🛫 Enter the class (economy, business, or first class): ");
         String classType = scanner.nextLine().trim().toLowerCase();
@@ -530,7 +337,7 @@ public class Flight {
                 flights.add(flight);
 
                 // 3. تحقق إذا كانت الرحلة موجودة في الملف
-                if (flight.getFlightnumber().equalsIgnoreCase(targetFlightNumber)) {
+                if (flight.getflightNumber().equalsIgnoreCase(targetflightNumber)) {
                     flightExists = true;
 
                     // 4. حسب الفئة المدخلة، طبع الأماكن المتاحة
@@ -554,15 +361,19 @@ public class Flight {
         }
     }
 
-    public void ReserveSeat(String classType, int seatsToBook, String flightFilePath) {
-        if (classType.equalsIgnoreCase("economy") && seatsToBook <= availableEconomySeats) {
-            availableEconomySeats -= seatsToBook;
-        } else if (classType.equalsIgnoreCase("business") && seatsToBook <= availableBusinessSeats) {
-            availableBusinessSeats -= seatsToBook;
-        } else if (classType.equalsIgnoreCase("first class") && seatsToBook <= availableFirstClassSeats) {
-            availableFirstClassSeats -= seatsToBook;
-        } else {
-            System.out.println("❌ Not enough available seats in " + classType + " class.");
+    public static void ReserveSeat(String filePath) {
+        Scanner scanner = new Scanner(System.in);
+
+        // 1. اسأل المستخدم عن رقم الرحلة والفئة
+        System.out.print("🔍 Enter flight number to reserve seats: ");
+        String targetflightNumber = scanner.nextLine().trim();
+
+        System.out.print("🛫 Enter the class (economy, business, or first class): ");
+        String classType = scanner.nextLine().trim().toLowerCase();
+
+        // تحقق من الفئة المدخلة
+        if (!(classType.equals("economy") || classType.equals("business") || classType.equals("first class"))) {
+            System.out.println("❌ Invalid class type. Please enter 'economy', 'business', or 'first class'.");
             return;
         }
 
@@ -581,12 +392,53 @@ public class Flight {
             while ((line = reader.readLine()) != null) {
                 flight = Flight.fromFileString(line);
 
-                // تحقق إذا كانت هذه الرحلة هي التي تم تحديثها
-                if (flight.getFlightnumber().equals(this.getFlightnumber())) {
-                    // تم تعديل المقاعد في الرحلة
-                    lines.add(flight.toFileString());  // تحديث الرحلة
-                } else {
-                    lines.add(line);  // إضافة الرحلات الأخرى كما هي
+                // 3. تحقق إذا كانت الرحلة موجودة في الملف
+                if (flight.getflightNumber().equalsIgnoreCase(targetflightNumber)) {
+                    flightExists = true;
+
+                    // تحقق من المقاعد المتاحة في الفئة المدخلة
+                    if (classType.equals("economy") && flight.getAvailableEconomySeats() > 0) {
+                        seatsAvailable = true;
+                    } else if (classType.equals("business") && flight.getAvailableBusinessSeats() > 0) {
+                        seatsAvailable = true;
+                    } else if (classType.equals("first class") && flight.getAvailableFirstClassSeats() > 0) {
+                        seatsAvailable = true;
+                    }
+
+                    if (!seatsAvailable) {
+                        System.out.println("❌ No available seats in the " + classType + " class.");
+                        return;
+                    }
+
+                    // 4. حجز المقاعد
+                    System.out.print("✈️ Enter number of seats to reserve: ");
+                    int seatsToReserve = scanner.nextInt();
+
+                    // تحقق من عدد المقاعد المتاحة
+                    if (seatsToReserve <= 0) {
+                        System.out.println("❌ Please enter a valid number of seats.");
+                        return;
+                    }
+
+                    // تحقق من أن عدد المقاعد المطلوبة لا يتجاوز العدد المتاح
+                    if ((classType.equals("economy") && seatsToReserve > flight.getAvailableEconomySeats()) ||
+                            (classType.equals("business") && seatsToReserve > flight.getAvailableBusinessSeats()) ||
+                            (classType.equals("first class") && seatsToReserve > flight.getAvailableFirstClassSeats())) {
+                        System.out.println("❌ Not enough available seats.");
+                        return;
+                    }
+
+                    // تحديث المقاعد المتاحة بناءً على الفئة المدخلة
+                    if (classType.equals("economy")) {
+                        flight.setAvailableEconomySeats(flight.getAvailableEconomySeats() - seatsToReserve);
+                    } else if (classType.equals("business")) {
+                        flight.setAvailableBusinessSeats(flight.getAvailableBusinessSeats() - seatsToReserve);
+                    } else if (classType.equals("first class")) {
+                        flight.setAvailableFirstClassSeats(flight.getAvailableFirstClassSeats() - seatsToReserve);
+                    }
+
+                    System.out.println("✅ Successfully reserved " + seatsToReserve + " seats in " + classType + " class.");
+                    break; // لا داعي للاستمرار في البحث بعد إيجاد الرحلة
                 }
             }
 
@@ -601,7 +453,24 @@ public class Flight {
         }
     }
 
-
-
+    @Override
+    public String toString() {
+        return flightNumber + "," +
+               seatClass + "," +
+               airline + "," +
+               origin + "," +
+               destination + "," +
+               departureTime + "," +
+               arrivalTime + "," +
+               economyFilghtSeats.getAvailable() + "," +
+               businessFilghtSeats.getAvailable() + "," +
+               firstClassFilghtSeats.getAvailable() + "," +
+               economyFilghtSeats.getBooked() + "," +
+               businessFilghtSeats.getBooked() + "," +
+               firstClassFilghtSeats.getBooked() + "," +
+               economyFilghtSeats.getPrice() + "," +
+               businessFilghtSeats.getPrice() + "," +
+               firstClassFilghtSeats.getPrice();
+    }
 }
 
