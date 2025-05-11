@@ -38,8 +38,16 @@ public class Booking {
         private String paymentStatus;
         private double totalPrice;
         private String seatClass;
+    private SeatSelection seatSelection;
 
-        // كونستركتور لإنشاء حجز جديد
+
+    public String getSeatClass() {
+        return seatSelection.getSeatClass();
+    }
+
+
+
+    // كونستركتور لإنشاء حجز جديد
         public Booking(Customer customer, Flight flight, List<Passenger> passengers, Map<Passenger, SeatSelection> seatSelections) {
             this.bookingReference = generateBookingReference();
             this.customer = customer;
@@ -54,6 +62,14 @@ public class Booking {
     public Booking() {
         this.bookingReference = generateBookingReference();
     }
+
+    public Booking(String bookingReference, String status, String paymentStatus, Flight flight, List<Passenger> passengers) {
+        this.bookingReference = bookingReference;
+        this.status = status;
+        this.flight = flight;
+        this.passengers = new ArrayList<>();
+    }
+
     private String generateBookingReference() {
         return "BK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
@@ -78,6 +94,68 @@ public class Booking {
         }
 
         return bookingReference + "," + status + "," + paymentStatus + "," + flight.getFlightnumber() + "," + passengerNames;
+    }
+
+
+    public static void saveToFile(List<Booking> bookings) {
+        File file = new File("bookings.txt");
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (Booking booking : bookings) {
+                writer.write(booking.toFileString());
+                writer.newLine(); // كل حجز في سطر جديد
+            }
+            System.out.println("✅ Bookings saved successfully.");
+        } catch (IOException e) {
+            System.out.println("❌ Error saving bookings: " + e.getMessage());
+        }
+    }
+
+
+    public static List<Booking> loadFromFile(List<Flight> allFlights) {
+        List<Booking> bookings = new ArrayList<>();
+        File file = new File("bookings.txt");
+
+        if (!file.exists()) return bookings;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",", 5); // أول 5 عناصر فقط
+
+                if (parts.length >= 5) {
+                    String bookingReference = parts[0];
+                    String status = parts[1];
+                    String paymentStatus = parts[2];
+                    String flightNumber = parts[3];
+                    String passengerData = parts[4];
+
+                    // نحاول نلاقي الرحلة حسب رقمها
+                    Flight flight = null;
+                    for (Flight f : allFlights) {
+                        if (f.getFlightnumber().equals(flightNumber)) {
+                            flight = f;
+                            break;
+                        }
+                    }
+
+                    if (flight == null) continue; // الرحلة مش موجودة
+
+                    // تقسيم أسماء الركاب
+                    List<Passenger> passengers = new ArrayList<>();
+                    String[] names = passengerData.split(",");
+                    for (String name : names) {
+                        passengers.add(new Passenger(name.trim()));
+                    }
+
+                    bookings.add(new Booking(bookingReference, status, paymentStatus, flight, passengers));
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("❌ Error reading bookings: " + e.getMessage());
+        }
+
+        return bookings;
     }
 
 
@@ -332,5 +410,32 @@ public class Booking {
             itinerary+="Status:"+status+"/n"+"Payment"+paymentStatus;
             return itinerary;
         }
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("📌 Booking Reference: ").append(bookingReference).append("\n");
+        sb.append("👤 Customer: ").append(customer != null ? customer.getUsername() : "N/A").append("\n");
+        sb.append("✈️ Flight: ").append(flight != null ? flight.getFlightnumber() : "N/A").append("\n");
+        sb.append("🎟️ Seat Class: ").append(seatClass != null ? seatClass : "N/A").append("\n");
+        sb.append("💺 Seats Reserved: ")
+                .append(seatSelection != null ? seatSelection.getQuantity() : "N/A")
+                .append(" in ").append(seatSelection != null ? seatSelection.getSeatClass() : "N/A").append("\n");
+
+        sb.append("👥 Passengers:\n");
+        if (passengers != null && !passengers.isEmpty()) {
+            for (Passenger p : passengers) {
+                sb.append("  - ").append(p.toString()).append("\n");
+            }
+        } else {
+            sb.append("  - None\n");
+        }
+
+        sb.append("📦 Status: ").append(status).append("\n");
+        sb.append("💳 Payment Status: ").append(paymentStatus).append("\n");
+        sb.append("💰 Total Price: ").append(totalPrice).append("\n");
+
+        return sb.toString();
     }
+
+}
 

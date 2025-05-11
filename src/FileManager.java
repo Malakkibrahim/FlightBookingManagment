@@ -7,6 +7,7 @@ public class FileManager {
     private static final String ADMIN_FILE = "administrators.txt";
     private static final String AGENT_FILE = "agents.txt";
     private static final String Flight_FILE = "flight.txt";
+    private static final String PAYMENTS_FILE = "payments.txt";
     public void saveAdminToFile(Administrator administrator) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(ADMIN_FILE, true))) {
             writer.write(administrator.toString());
@@ -140,4 +141,92 @@ public class FileManager {
         return agents;
     }
 
+    public static void savePayments(List<Payment> payments , String PAYMENTS_FILE) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("payments.txt", true))) {
+            // For each payment in the list, write its details to the file
+            for (Payment payment : payments) {
+                writer.write(payment.toFileString());
+                writer.newLine(); // Add a newline between each payment record
+            }
+            System.out.println("Payments have been saved successfully.");
+        } catch (IOException e) {
+            System.out.println("❌ Error saving payment data.");
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void updateFlightFile(Flight flight, String flightFilePath) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("flights.txt"));
+             BufferedWriter writer = new BufferedWriter(new FileWriter("flights.txt"))) {
+
+            List<String> lines = new ArrayList<>();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                flight = Flight.fromFileString(line);
+
+                // تحقق إذا كانت هذه الرحلة هي التي تم تحديثها
+                if (flight.getFlightnumber().equals(flight.getFlightnumber())) {
+                    // تم تعديل المقاعد في الرحلة
+                    lines.add(flight.toFileString());  // تحديث الرحلة
+                } else {
+                    lines.add(line);  // إضافة الرحلات الأخرى كما هي
+                }
+            }
+
+            // الكتابة مرة أخرى في الملف
+            for (String fileLine : lines) {
+                writer.write(fileLine);
+                writer.newLine();
+            }
+
+        } catch (IOException e) {
+            System.out.println("❌ Error while updating flight data.");
+        }
+    }
+
+
+    public static void saveBookings(List<Booking> bookings, String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (Booking booking : bookings) {
+                writer.write(booking.toFileString()); // لازم تكون عملت toFileString() في كلاس Booking
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("❌ Error saving bookings to file.");
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void saveCustomerToFile(Customer customer, String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+            writer.write(customer.toFileString());
+            writer.newLine();
+        } catch (IOException e) {
+            System.out.println("Error saving customer data to file.");
+        }
+    }
+
+    // Method to load all customers from a file
+    public static List<Customer> loadCustomersFromFile(String filePath) {
+        List<Customer> customers = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Customer customer = Customer.fromFileString(line);  // assuming a method to parse customer from file
+                customers.add(customer);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading customer data from file.");
+        }
+        return customers;
+    }
+
+
+
 }
+
+
+
+

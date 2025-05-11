@@ -17,7 +17,8 @@ public class Passenger {
     private LocalDate dateOfbirth;
     private String specialRequests;
     private static final String PASSENGERS_FILE = "passengers.txt";
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
 
     //بنعمله عشان نعمل  passenger جديد// ✅ حفظ الراكب في الملف
     public void saveToFile() {
@@ -142,6 +143,16 @@ public class Passenger {
     }
     public String toFileString() {
         return passengerId + "," + passengerName + "," + passportNumber + "," + dateOfbirth.format(formatter) + "," + specialRequests;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Passenger ID: " + passengerId +
+                ", Name: " + passengerName +
+                ", Passport: " + passportNumber +
+                ", Date of Birth: " + dateOfbirth.format(formatter) +
+                (specialRequests != null && !specialRequests.isEmpty() ? ", Special Requests: " + specialRequests : "");
     }
 
 }

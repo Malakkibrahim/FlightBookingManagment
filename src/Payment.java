@@ -1,6 +1,9 @@
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 public class Payment {
     private String paymentId;
     private String bookingReference;
@@ -102,6 +105,38 @@ public class Payment {
         }
     }
 
+
+    public static List<Payment> loadFromFile() {
+        List<Payment> payments = new ArrayList<>();
+        File file = new File(PAYMENTS_FILE);
+
+        if (!file.exists()) {
+            return payments; // لو الملف مش موجود بيرجع ليست فاضية
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length == 6) {
+                    String paymentId = data[0];
+                    String bookingReference = data[1];
+                    double amount = Double.parseDouble(data[2]);
+                    String method = data[3];
+                    String status = data[4];
+                    String transactionDate = data[5];
+
+                    payments.add(new Payment(paymentId, bookingReference, amount, method, status, transactionDate));
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("❌ Error loading payments: " + e.getMessage());
+        }
+
+        return payments;
+    }
+
+
     public void updateStatus(String newStatus) {
         this.status = newStatus;
         updatePaymentInFile();
@@ -154,4 +189,10 @@ public class Payment {
             System.out.println(" Error updating payment status in file.");
         }
     }
+
+    @Override
+    public String toString() {
+        return paymentId + "," + bookingReference + "," + amount + "," + method + "," + status + "," + transactionDate;
+    }
+
 }

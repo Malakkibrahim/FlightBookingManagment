@@ -1,319 +1,309 @@
+import java.io.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.Scanner;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.stream.Collectors;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+    public class Customer extends User {
+        private String address;
+        private String prefrence;
+        private List<Booking> bookings;
+
+        public Customer(String userId, String username, String password, String name, String email, String contactInfo, String address,String prefrence, Role role , List<Booking> bookings) {
+            super(userId, username, password, name, email, contactInfo,role);
+            this.address = address;
+            this.bookings = new ArrayList<>();
+
+        }
+
+        public String getUsername() {
+            return userName;
+        }
 
 
-public class Customer extends User{
-    private String customerId;
-    private String address;
-    private String bookingHistoryFile;
-    // TODO What is preferences?
-    private String preferences;
-    private int AvailableSeats;
-    private BookingSystem bookingSystem;
-    //private int availableFlights;
 
-    public Customer(String address, int availableSeats, String bookingHistoryFile, BookingSystem bookingSystem, String customerId, String preferences) {
-        this.address = address;
-        AvailableSeats = availableSeats;
-        this.bookingHistoryFile = bookingHistoryFile;
-        this.bookingSystem = bookingSystem;
-        this.customerId = customerId;
-        this.preferences = preferences;
-    }
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        public void SHOWMENU(){
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("---- Customer Menu ----");
+            System.out.println("1. Search for a flight");
+            System.out.println("2. Modify System Settings");
+            System.out.println("3. View System Logs");
+            System.out.println("4. Manage User Access");
+            System.out.println("5. Update Profile");
+            System.out.println("6. Logout");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            switch(choice){
+                case 1:
 
 
-    public Customer(String userId, String userName, String password, String name, String email, String contactinfo, String role, String address, int availableSeats, String bookingHistoryFile, BookingSystem bookingSystem, String customerId, String preferences) {
-        super(userId, userName, password, name, email, contactinfo, role);
-        this.address = address;
-        AvailableSeats = availableSeats;
-        this.bookingHistoryFile = bookingHistoryFile;
-        this.bookingSystem = bookingSystem;
-        this.customerId = customerId;
-        this.preferences = preferences;
-    }
-
-    public Customer(String customerId, String address, String bookingHistoryFile, String preferences, BookingSystem bookingSystem) {
-        this.customerId = customerId;
-        this.address = address;
-        this.bookingHistoryFile = bookingHistoryFile;
-        this.preferences = preferences;
-        this.bookingSystem = bookingSystem;
-
-    }
-
-    public List<String> getBookingHistory() {
-        List<String> history = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(bookingHistoryFile))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                history.add(line);
             }
-        } catch (IOException e) {
-            System.err.println("Error reading booking history for customer " + customerId + ": " + e.getMessage());
         }
-        return history;
-    }
 
 
-    public String getCustomerId() {
-        return customerId;
-    }
+        // 1. Search flights
+        public static void searchFlightByNumber(String filePath) {
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("🔍 Enter flight number to search: ");
+            String targetFlightNumber = scanner.nextLine().trim();
 
+            boolean found = false;
 
-    public void setBookingSystem(BookingSystem bookingSystem) {
-        this.bookingSystem = bookingSystem;
-    } // ميثود لإضافة مرجع حجز جديد إلى الملف
-    private void saveBookingReference(String bookingReference) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(bookingHistoryFile, true))) {
-            writer.write(bookingReference);
-            writer.newLine();
-        } catch (IOException e) {
-            System.err.println("Error saving booking reference for customer " + customerId + ": " + e.getMessage());
-        }
-    }
-
-    // ميثود لإزالة مرجع حجز من الملف (عند الإلغاء)
-    private void removeBookingReference(String bookingReference) {
-        List<String> tempHistory = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(bookingHistoryFile))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (!line.equals(bookingReference)) {
-                    tempHistory.add(line);
+            try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Flight flight = Flight.fromFileString(line);
+                    if (flight.getFlightnumber().equalsIgnoreCase(targetFlightNumber)) {
+                        System.out.println("✅ Flight found!");
+                        System.out.println("✈️ Departure Time: " + flight.getDepartureTime());
+                        System.out.println("🛬 Arrival Time  : " + flight.getArrivalTime());
+                        found = true;
+                        break;
+                    }
                 }
+
+                if (!found) {
+                    System.out.println("❌ Flight not found.");
+                }
+
+            } catch (IOException e) {
+                System.out.println("❌ Error reading file ");
             }
-        } catch (IOException e) {
-            System.err.println("Error reading booking history for customer " + customerId + ": " + e.getMessage());
-            return;
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(bookingHistoryFile))) {
-            for (String ref : tempHistory) {
-                writer.write(ref);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.err.println("Error updating booking history for customer " + customerId + ": " + e.getMessage());
-        }
-    }
 
+        // 2. Create booking
+        public void createBooking(List<Booking> bookings, List<Payment> payments, String flightFilePath, String passengerFilePath , String paymentFilePath) {
+            Scanner scanner = new Scanner(System.in);
 
+            // Step 1: طلب رقم الرحلة من المستخدم
+            System.out.print("Enter flight number to book: ");
+            String flightNumber = scanner.nextLine().trim();
 
-    public String getAddress() {
-        return address;
-    }
+            Flight selectedFlight = null;
 
-    public String getPreferences() {
-        return preferences;
-    }
-
-     public int getAvailableSeats() {
-      return AvailableSeats;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public void setPreferences(String preferences) {
-        this.preferences = preferences;
-    }
-
-     public void setAvailableSeats(int AvailableSeats) {
-      this.AvailableSeats = AvailableSeats;
-    }
-
-
-    public void searchFlights(Scanner scanner)
-    {
-        System.out.println("Search Flights");
-        System.out.print("Enter Origin:");
-        String origin = scanner.nextLine();
-        System.out.print("Enter Destination:");
-        String destination = scanner.nextLine();
-        System.out.println("Enter Departure Date (YYYY-MM-DD):");
-        String dateStr = scanner.nextLine();
-        LocalDateTime departureDate;
-        try {
-            departureDate = LocalDateTime.parse(dateStr + "T00:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        } catch (Exception e) {
-            System.out.println("Invalid date format. Please use YYYY-MM-DD.");
-            return;
-        }
-        List<Flight> availableFlights = bookingSystem.searchFlights(origin, destination, departureDate.toLocalDate());
-
-        if (availableFlights.isEmpty()) {
-            System.out.println("No flights found matching your criteria.");
-        } else {
-            System.out.println("\n--- Available Flights ---");
-            for (Flight flight : availableFlights) {
-                System.out.println(flight); // Assuming Flight class has a toString() method
-            }
-            createBooking(scanner, availableFlights);
-        }
-    }
-
-
-    public void creataBooking(List<Flight>availableFlights)
-    {
-        System.out.println(" Create Booking ");
-        System.out.print("Enter Flight Number to book: ");
-        Scanner scanner = new Scanner(System.in);
-        String flightNumber = scanner.nextLine();
-        Flight selectedFlight = availableFlights.stream()
-                .filter(flight -> flight.getFlightnumber().equalsIgnoreCase(flightNumber))
-                .findFirst()
-                .orElse(null);
-        if (selectedFlight == null) {
-            System.out.println("Invalid flight number.");
-            return;
-        }
-        System.out.print("Enter number of passengers: ");
-        int numPassengers = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
-        List<Passenger> passengers = new ArrayList<>();
-        for (int i = 0; i < numPassengers; i++) {
-            System.out.println("Passenger " + (i + 1) + " Information ---");
-            System.out.print("Enter Passenger Name: ");
-            String name = scanner.nextLine();
-            System.out.print("Enter Passport Number: ");
-            String passportNumber = scanner.nextLine();
-            System.out.print("Enter Date of Birth (YYYY-MM-DD): ");
-            String dobStr = scanner.nextLine();
-            LocalDateTime dob;
-            try {
-                dob = LocalDateTime.parse(dobStr + "T00:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            } catch (Exception e) {
-                System.out.println("Invalid date format for DOB. Please use YYYY-MM-DD.");
+            // Step 2: البحث عن الرحلة في ملف الرحلات
+            try (BufferedReader reader = new BufferedReader(new FileReader(flightFilePath))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Flight flight = Flight.fromFileString(line);
+                    if (flight.getFlightnumber().equalsIgnoreCase(flightNumber)) {
+                        selectedFlight = flight;
+                        break; // إذا وجدنا الرحلة، نوقف البحث
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println("Error reading flight data from file.");
                 return;
             }
-            passengers.add(new Passenger(generatePassengerId(), name, passportNumber, dob.toLocalDate(), ""));
-        }
-        System.out.print("Select Seat Class (Economy, Business, First Class): ");
-        String seatClass = scanner.nextLine();
-        Booking newBooking = bookingSystem.createBooking(this, selectedFlight, passengers, seatClass);
-        if (newBooking != null) {
-            saveBookingReference(newBooking.getBookingReference()); // حفظ مرجع الحجز في الملف
-            System.out.println("\nBooking successful! Your booking reference is: " + newBooking.getBookingReference());
-            System.out.println("Booking details:\n" + newBooking); // Assuming Booking has a toString()
-            bookingSystem.getFileManager().saveBookings(bookingSystem.getBookings()); // تحديث ملف الحجوزات العام
-        } else {
-            System.out.println("Failed to create booking.");
-        }
-    }
 
-    public void viewBooking()
-    {
-        System.out.println("Your Bookings ");
-        boolean foundBookings = false;
-        try (BufferedReader reader = new BufferedReader(new FileReader(bookingHistoryFile))) {
-            String bookingReference;
-            while ((bookingReference = reader.readLine()) != null) {
-                Booking booking = bookingSystem.getBookings().stream()
-                        .filter(b -> b.getBookingReference().equals(bookingReference) && b.getCustomer().getCustomerId().equals(this.customerId))
-                        .findFirst()
-                        .orElse(null);
-                if (booking != null) {
-                    System.out.println(booking); // Assuming Booking has a toString()
-                    foundBookings = true;
-                } else {
-                    System.out.println("Error: Booking with reference " + bookingReference + " not found.");
+            // Step 3: إذا لم يتم العثور على الرحلة
+            if (selectedFlight == null) {
+                System.out.println("❌ Flight not found.");
+                return;
+            }
+
+            // Step 4: عرض بعض المعلومات عن الرحلة
+            System.out.println("✔️ Flight found: " + selectedFlight.getFlightnumber());
+            System.out.println("✈️ Airline: " + selectedFlight.getAirline());
+            System.out.println("📍 Origin: " + selectedFlight.getOrigin() + " -> " + selectedFlight.getDestination());
+            System.out.println("⏰ Departure: " + selectedFlight.getDepartureTime());
+            System.out.println("🛬 Arrival: " + selectedFlight.getArrivalTime());
+            System.out.println("Seats available in Economy: " + selectedFlight.getAvailableEconomySeats());
+            System.out.println("Seats available in Business: " + selectedFlight.getAvailableBusinessSeats());
+            System.out.println("Seats available in First Class: " + selectedFlight.getAvailableFirstClassSeats());
+
+            // Step 5: التأكد من توفر المقاعد في الفئة المطلوبة
+            System.out.print("Enter seat class (Economy/Business/First): ");
+            String seatClass = scanner.nextLine().trim();
+
+            // التحقق من الفئة المختارة
+            while (!seatClass.equalsIgnoreCase("Economy") &&
+                    !seatClass.equalsIgnoreCase("Business") &&
+                    !seatClass.equalsIgnoreCase("First")) {
+                System.out.println("❌ Invalid seat class. Please enter Economy, Business, or First.");
+                seatClass = scanner.nextLine().trim();
+            }
+
+            int availableSeats = 0;
+            if (seatClass.equalsIgnoreCase("Economy")) {
+                availableSeats = selectedFlight.getAvailableEconomySeats();
+            } else if (seatClass.equalsIgnoreCase("Business")) {
+                availableSeats = selectedFlight.getAvailableBusinessSeats();
+            } else if (seatClass.equalsIgnoreCase("First")) {
+                availableSeats = selectedFlight.getAvailableFirstClassSeats();
+            }
+
+            if (availableSeats <= 0) {
+                System.out.println("❌ No available seats in " + seatClass + " class.");
+                return;
+            }
+
+            // Step 6: طلب عدد المقاعد التي يرغب المستخدم في حجزها
+            System.out.print("How many seats would you like to book? ");
+            int seatsToBook = scanner.nextInt();
+
+            if (seatsToBook > availableSeats) {
+                System.out.println("❌ Not enough available seats.");
+                return;
+            }
+
+            // Step 7: إضافة تفاصيل الراكب
+            scanner.nextLine();  // للانتقال للسطر التالي بعد قراءة عدد المقاعد
+            System.out.print("Passenger name: ");
+            String pname = scanner.nextLine();
+            System.out.print("Passport number: ");
+            String passport = scanner.nextLine();
+            System.out.print("Date of birth (YYYY-MM-DD): ");
+            String dobString = scanner.nextLine();  // قراءة تاريخ الميلاد كـ String
+
+            // تحويل النص إلى LocalDate باستخدام DateTimeFormatter
+            LocalDate dob = LocalDate.parse(dobString, Passenger.formatter);
+            System.out.print("Any special requests? (leave blank if none): ");
+            String specialRequest = scanner.nextLine();
+
+            // إضافة المسافر إلى الحجز
+            Passenger p = new Passenger(pname, passport, dob, specialRequest);
+            Booking b = new Booking("BKG" + System.currentTimeMillis(), selectedFlight, p, seatClass, selectedFlight.CalcPrice(seatClass, seatsToBook));
+
+            bookings.add(b);
+            selectedFlight.ReserveSeat(seatClass, seatsToBook , flightFilePath);  // تحديث المقاعد المحجوزة في الرحلة
+
+            System.out.println("Booking successful! Your reference: " + b.getBookingReference());
+
+            // Step 8: حفظ بيانات الحجز في ملف الركاب
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(passengerFilePath, true))) {
+                writer.write(p.toFileString());
+                writer.newLine();
+            } catch (IOException e) {
+                System.out.println("Error saving passenger data.");
+            }
+
+            // Step 9: عملية الدفع
+            System.out.print("Enter payment method (Credit/Debit/Cash): ");
+            String paymentMethod = scanner.nextLine().trim();
+            String paymentId = "PAY" + System.currentTimeMillis();
+            String transactionDate = java.time.LocalDate.now().toString();
+
+            Payment payment = new Payment(paymentId, b.getBookingReference(), b.getTotalPrice(), paymentMethod, "Confirmed", transactionDate);
+            payments.add(payment);
+            FileManager.savePayments(payments , paymentFilePath);  // حفظ المدفوعات في الملف
+
+            System.out.println("Payment successful. Reference: " + paymentId);
+        }
+
+
+        // 3. View bookings
+        public void viewBookings(List<Booking> bookings) {
+            System.out.println("\n--- Your Bookings ---");
+            boolean found = false;
+            for (Booking b : bookings) {
+                if (b.getCustomer().getUsername().equals(this.userName)) {
+                    System.out.println(b);
+                    found = true;
                 }
             }
-        } catch (IOException e) {
-            System.err.println("Error reading booking history for customer " + customerId + ": " + e.getMessage());
-        }
-        if (!foundBookings) {
-            System.out.println("No bookings found for your account.");
-        }
-    }
-
-
-    public void cancelBooking()
-    {
-        System.out.println("Cancel Booking");
-        System.out.print("Enter Booking Reference to cancel");
-        Scanner scanner = new Scanner(System.in);
-        String BookingRefernceToCancel = scanner.nextLine();
-        Booking bookingToRemove = bookingSystem.getBooking().stream.filter(b -> b.getBookingReference().equalsIgnoreCase(bookingReferenceToCancel) && b.getCustomer().getCustomerId().equals(this.customerId)) .findFirst() .orElse(null);
-        if (bookingToRemove != null) {
-            bookingSystem.cancelBooking(bookingToRemove.getBookingReference());
-            removeBookingReference(bookingToRemove.getBookingReference());
-            System.out.println("Booking with reference " + bookingReferenceToCancel + " cancelled successfully.");
-            bookingSystem.getFileManager().saveBookings(bookingSystem.getBookings());
-        } else {
-            System.out.println("Booking with reference " + bookingReferenceToCancel + " not found for your account.");
-        }
-    }
-
-    public void viewSeatsAvailability() {
-        System.out.println("View Seat Availability");
-        System.out.print("Enter Flight Number to view availability: ");
-        Scanner scanner = new Scanner(System.in);
-        String flightNumber = scanner.nextLine();
-
-        Flight flight = bookingSystem.getFlights().stream()
-                .filter(f -> f.getFlightnumber().equalsIgnoreCase(flightNumber))
-                .findFirst()
-                .orElse(null);
-
-        if (flight != null) {
-            System.out.println("Seat Availability for Flight " + flight.getFlightnumber() + ":");
-            System.out.println("Economy: " + flight.getAvailableEconomySeats() + " seats");
-            System.out.println("Business: " + flight.getAvailableBusinessSeats() + " seats");
-            System.out.println("First Class: " + flight.getAvailableFirstClassSeats() + " seats");
-        } else {
-            System.out.println("Flight with number " + flightNumber + " not found.");
-        }
-    }
-
-
-    @Override
-    public void SHOWMENU(){
-        System.out.println("\n--- Customer Dashboard ---");
-        System.out.println("Welcome, " + getName() + "!");
-        int choice;
-        do {
-            System.out.println("\nChoose an action:");
-            System.out.println("1. Search Flights");
-            System.out.println("2. View My Bookings");
-            System.out.println("3. Cancel Booking");
-            System.out.println("4. View Seat Availability");
-            System.out.println("5. Logout");
-            System.out.print("Enter your choice: ");
-            Scanner scanner = new Scanner(System.in);
-            choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
-
-            switch (choice) {
-                case 1:
-                    searchFlights(scanner);
-                    break;
-                case 2:
-                    viewBooking();
-                    break;
-                case 3:
-                    cancelBooking();
-                    break;
-                case 4:
-                    viewSeatsAvailability();
-                    break;
-                case 5:
-                    System.out.println("Logging out...");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+            if (!found) {
+                System.out.println("No bookings found.");
             }
-        } while (choice != 5);
+        }
+
+        // 4. Cancel booking
+        public void cancelBooking(List<Booking> bookings, List<Payment> payments, String bookingFilePath, String paymentFilePath, String flightFilePath) {
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Enter booking reference to cancel: ");
+            String ref = scanner.nextLine().trim();
+
+            Booking toCancel = null;
+            for (Booking b : bookings) {
+                if (b.getBookingReference().equalsIgnoreCase(ref)
+                        && b.getCustomer().getUsername().equals(this.userName)) {
+                    toCancel = b;
+                    break;
+                }
+            }
+
+            if (toCancel != null) {
+                // 1. تعديل المقاعد المتاحة في الرحلة
+                Flight flight = toCancel.getFlight();
+                String seatClass = toCancel.getSeatClass();
+
+                switch (seatClass.toLowerCase()) {
+                    case "economy":
+                        flight.setAvailableEconomySeats(flight.getAvailableEconomySeats() + 1);
+                        break;
+                    case "business":
+                        flight.setAvailableBusinessSeats(flight.getAvailableBusinessSeats() + 1);
+                        break;
+                    case "first":
+                        flight.setAvailableFirstClassSeats(flight.getAvailableFirstClassSeats() + 1);
+                        break;
+                }
+
+                // 2. إزالة الحجز من القائمة
+                bookings.remove(toCancel);
+
+                // 3. حذف أي مدفوعات مرتبطة بالحجز
+                payments.removeIf(p -> p.getBookingReference().equalsIgnoreCase(ref));
+
+                // 4. تحديث ملف الرحلات
+                FileManager.updateFlightFile(flight, flightFilePath);
+
+                // 5. حفظ قائمة الحجوزات الجديدة
+                FileManager.saveBookings(bookings, bookingFilePath);
+
+                // 6. حفظ قائمة المدفوعات الجديدة
+                FileManager.savePayments(payments, paymentFilePath);
+
+                System.out.println("✅ Booking canceled and seat returned to flight.");
+            } else {
+                System.out.println("❌ No booking found with this reference under your username.");
+            }
+        }
+
+
+        @Override
+        public String getUserId() {
+            return userId;
+        }
+
+        public static Customer fromFileString(String fileString) {
+            String[] data = fileString.split(",");
+            String userId = data[0];
+            String userName = data[1];
+            String password = data[2];
+            String name = data[3];
+            String email = data[4];
+            String contactInfo = data[5];
+            String address = data[6];
+            String prefrence = data[7];
+            Role role = Role.valueOf(data[8]);  // Assuming you have an enum for roles
+            List<Booking> bookings = new ArrayList<>(); // Need to implement logic to load bookings if necessary
+            return new Customer(userId, userName, password, name, email, contactInfo, address,prefrence, role, bookings);
+        }
+
+        public String toFileString() {
+            // Convert the customer data into a comma-separated string format
+            return userId + "," +
+                    userName + "," +
+                    password + "," +
+                    name + "," +
+                    email + "," +
+                    contactinfo + "," +
+                    address + "," +
+                    prefrence +","+
+                    role.toString() + "," +
+                    bookings.size();  // Optionally, you can add a count of bookings or the bookings' details
+        }
+
+
     }
-}
+

@@ -71,6 +71,8 @@ public class Administrator extends User {
             case 6:
                 logout();
                 break;
+            default:
+                System.out.println("there is an error in your choice ");
 
         }
     }
@@ -123,9 +125,7 @@ public class Administrator extends User {
                 String depart = scanner.nextLine();
                 System.out.println("Enter your commision");
                 double commision = scanner.nextDouble();
-                System.out.println("Enter your AgentID");
-                String agentid = scanner.nextLine();
-                users.add(new Agent(depart,commision,id, username, password, name, email, contact, role,agentid));
+                users.add(new Agent(depart,commision,id, username, password, name, email, contact, role,UUID.randomUUID()));
                 break;
             case 3:
                 role = Role.ADMINSTRITOR;
@@ -140,6 +140,7 @@ public class Administrator extends User {
 
         System.out.println("✅ User created successfully!");
     }
+
     public void modifySystemSettings() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("🔧 Enter setting key to modify: ");

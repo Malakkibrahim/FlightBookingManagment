@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -25,7 +22,10 @@ public class Flight {
     private double economyPrice;
     private double businessPrice;
     private double FirstClassPrice;
+   private String classType;
+    private int  seatsToBook;
 
+   static String filePath = "flights.txt";
     public Flight(String Flightno, String airline, String origin, String destination, LocalDateTime departureTime, LocalDateTime arrivalTime) {
         super();
         this.Flightnumber = Flightno;
@@ -55,6 +55,31 @@ public class Flight {
         Flightnumber = flightnumber;
         Origin = origin;
     }
+
+    public Flight(String flightNumber, String seatClass, String airline, String origin, String destination,
+                  LocalDateTime departureTime, LocalDateTime arrivalTime,
+                  int availableEconomySeats, int availableBusinessSeats, int availableFirstClassSeats,
+                  int bookedEconomySeats, int bookedBusinessSeats, int bookedFirstClassSeats,
+                  double economyPrice, double businessPrice, double firstClassPrice) {
+
+        this.Flightnumber = flightNumber;
+        this.seatClass = seatClass;
+        this.Airline = airline;
+        this.Origin = origin;
+        this.Destination = destination;
+        this.DepartureTime = departureTime;
+        this.ArrivalTime = arrivalTime;
+        this.availableEconomySeats = availableEconomySeats;
+        this.availableBusinessSeats = availableBusinessSeats;
+        this.availableFirstClassSeats = availableFirstClassSeats;
+        this.bookedEconomySeats = bookedEconomySeats;
+        this.bookedBusinessSeats = bookedBusinessSeats;
+        this.bookedFirstClassSeats = bookedFirstClassSeats;
+        this.economyPrice = economyPrice;
+        this.businessPrice = businessPrice;
+        this.FirstClassPrice = firstClassPrice;
+    }
+
     public Flight() {
         // Constructor افتراضي لا يعمل شيء
     }
@@ -196,6 +221,72 @@ public class Flight {
         availableFirstClassSeats++;
     }
 
+    public void saveToFile() {
+        File file = new File(filePath);
+        List<Flight> existingFlights = new ArrayList<>();
+
+        // Step 1: قراءة الرحلات الموجودة
+        if (file.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    existingFlights.add(Flight.fromFileString(line));
+                }
+            } catch (IOException e) {
+                System.out.println("❌ Error reading flights: " + e.getMessage());
+                return;
+            }
+        }
+
+        // Step 2: التأكد إن رقم الرحلة مش موجود
+        for (Flight f : existingFlights) {
+            if (f.getFlightnumber().equalsIgnoreCase(this.Flightnumber)) {
+                System.out.println("⚠️ Flight with number " + this.Flightnumber + " already exists!");
+                return;
+            }
+        }
+
+        // Step 3: إضافة الرحلة للملف
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+            writer.write(this.toFileString());
+            writer.newLine();
+            System.out.println("✅ Flight saved successfully.");
+        } catch (IOException e) {
+            System.out.println("❌ Error writing flight: " + e.getMessage());
+        }
+    }
+
+    public static Flight fromFileString(String line) {
+        String[] parts = line.split(",");
+        if (parts.length < 16) {
+            throw new IllegalArgumentException("Invalid flight record: " + line);
+        }
+
+        return new Flight(
+                parts[0].trim(),  // Flightnumber
+                parts[1].trim(),  // seatClass
+                parts[2].trim(),  // Airline
+                parts[3].trim(),  // Origin
+                parts[4].trim(),  // Destination
+                LocalDateTime.parse(parts[5].trim()),
+                LocalDateTime.parse(parts[6].trim()),
+                Integer.parseInt(parts[7].trim()),  // availableEconomySeats
+                Integer.parseInt(parts[8].trim()),  // availableBusinessSeats
+                Integer.parseInt(parts[9].trim()),  // availableFirstClassSeats
+                Integer.parseInt(parts[10].trim()), // bookedEconomySeats
+                Integer.parseInt(parts[11].trim()), // bookedBusinessSeats
+                Integer.parseInt(parts[12].trim()), // bookedFirstClassSeats
+                Double.parseDouble(parts[13].trim()), // economyPrice
+                Double.parseDouble(parts[14].trim()), // businessPrice
+                Double.parseDouble(parts[15].trim())  // FirstClassPrice
+        );
+    }
+
+
+
+
+
+
     public boolean getAvailableSeats(String flightNumber, int numberOfSeats, boolean decrease) {
         if (!this.Flightnumber.equals(flightNumber)) {
             System.out.println("رقم الرحلة غير متطابق.");
@@ -239,7 +330,7 @@ public class Flight {
 
     public void SHOWMENU(){
     Scanner scanner = new Scanner(System.in);
-        String filePath = "flights.txt";
+
         System.out.println("Calc Price...");
         System.out.println("Update Schedule...");
         System.out.println("Reserve Seat....");
@@ -253,7 +344,7 @@ public class Flight {
                 updateScheduleInFile(filePath);
                 break;
             case 3:
-                ReserveSeat(filePath);
+                ReserveSeat(String classType, int seatsToBook);
                 break;
             case 4:
                 CheckAvailability(filePath);
@@ -463,102 +554,53 @@ public class Flight {
         }
     }
 
-    public static void ReserveSeat(String filePath) {
-        Scanner scanner = new Scanner(System.in);
-
-        // 1. اسأل المستخدم عن رقم الرحلة والفئة
-        System.out.print("🔍 Enter flight number to reserve seats: ");
-        String targetFlightNumber = scanner.nextLine().trim();
-
-        System.out.print("🛫 Enter the class (economy, business, or first class): ");
-        String classType = scanner.nextLine().trim().toLowerCase();
-
-        // تحقق من الفئة المدخلة
-        if (!(classType.equals("economy") || classType.equals("business") || classType.equals("first class"))) {
-            System.out.println("❌ Invalid class type. Please enter 'economy', 'business', or 'first class'.");
+    public void ReserveSeat(String classType, int seatsToBook, String flightFilePath) {
+        if (classType.equalsIgnoreCase("economy") && seatsToBook <= availableEconomySeats) {
+            availableEconomySeats -= seatsToBook;
+        } else if (classType.equalsIgnoreCase("business") && seatsToBook <= availableBusinessSeats) {
+            availableBusinessSeats -= seatsToBook;
+        } else if (classType.equalsIgnoreCase("first class") && seatsToBook <= availableFirstClassSeats) {
+            availableFirstClassSeats -= seatsToBook;
+        } else {
+            System.out.println("❌ Not enough available seats in " + classType + " class.");
             return;
         }
 
-        // 2. قراءة الرحلات من الملف
-        List<Flight> flights = new ArrayList<>();
-        boolean flightExists = false;
-        boolean seatsAvailable = false;
+        // بعد الحجز، قم بتحديث ملف الرحلات باستخدام الكائن الحالي
+        updateFlightFile(this, flightFilePath);
+    }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+
+    // هذه الطريقة لتحديث بيانات الرحلات في الملف بعد التعديل
+    public void updateFlightFile(Flight flight, String flightFilePath) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("flights.txt"));
+             BufferedWriter writer = new BufferedWriter(new FileWriter("flights.txt"))) {
+
+            List<String> lines = new ArrayList<>();
             String line;
             while ((line = reader.readLine()) != null) {
-                Flight flight = Flight.FromFileString(line);
-                flights.add(flight);
+                flight = Flight.fromFileString(line);
 
-                // 3. تحقق إذا كانت الرحلة موجودة في الملف
-                if (flight.getFlightnumber().equalsIgnoreCase(targetFlightNumber)) {
-                    flightExists = true;
-
-                    // تحقق من المقاعد المتاحة في الفئة المدخلة
-                    if (classType.equals("economy") && flight.getAvailableEconomySeats() > 0) {
-                        seatsAvailable = true;
-                    } else if (classType.equals("business") && flight.getAvailableBusinessSeats() > 0) {
-                        seatsAvailable = true;
-                    } else if (classType.equals("first class") && flight.getAvailableFirstClassSeats() > 0) {
-                        seatsAvailable = true;
-                    }
-
-                    if (!seatsAvailable) {
-                        System.out.println("❌ No available seats in the " + classType + " class.");
-                        return;
-                    }
-
-                    // 4. حجز المقاعد
-                    System.out.print("✈️ Enter number of seats to reserve: ");
-                    int seatsToReserve = scanner.nextInt();
-
-                    // تحقق من عدد المقاعد المتاحة
-                    if (seatsToReserve <= 0) {
-                        System.out.println("❌ Please enter a valid number of seats.");
-                        return;
-                    }
-
-                    // تحقق من أن عدد المقاعد المطلوبة لا يتجاوز العدد المتاح
-                    if ((classType.equals("economy") && seatsToReserve > flight.getAvailableEconomySeats()) ||
-                            (classType.equals("business") && seatsToReserve > flight.getAvailableBusinessSeats()) ||
-                            (classType.equals("first class") && seatsToReserve > flight.getAvailableFirstClassSeats())) {
-                        System.out.println("❌ Not enough available seats.");
-                        return;
-                    }
-
-                    // تحديث المقاعد المتاحة بناءً على الفئة المدخلة
-                    if (classType.equals("economy")) {
-                        flight.setAvailableEconomySeats(flight.getAvailableEconomySeats() - seatsToReserve);
-                    } else if (classType.equals("business")) {
-                        flight.setAvailableBusinessSeats(flight.getAvailableBusinessSeats() - seatsToReserve);
-                    } else if (classType.equals("first class")) {
-                        flight.setAvailableFirstClassSeats(flight.getAvailableFirstClassSeats() - seatsToReserve);
-                    }
-
-                    System.out.println("✅ Successfully reserved " + seatsToReserve + " seats in " + classType + " class.");
-                    break; // لا داعي للاستمرار في البحث بعد إيجاد الرحلة
+                // تحقق إذا كانت هذه الرحلة هي التي تم تحديثها
+                if (flight.getFlightnumber().equals(this.getFlightnumber())) {
+                    // تم تعديل المقاعد في الرحلة
+                    lines.add(flight.toFileString());  // تحديث الرحلة
+                } else {
+                    lines.add(line);  // إضافة الرحلات الأخرى كما هي
                 }
             }
-        } catch (Exception e) {
-            System.out.println("❌ Error reading file or parsing flight data.");
-        }
 
-        // 5. إذا لم يتم العثور على الرحلة في الملف
-        if (!flightExists) {
-            System.out.println("❌ Flight number not found.");
-            return;
-        }
-
-        // 6. تحديث الملف بعد الحجز
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (Flight flight : flights) {
-                writer.write(flight.toFileString());
+            // الكتابة مرة أخرى في الملف
+            for (String fileLine : lines) {
+                writer.write(fileLine);
                 writer.newLine();
             }
-        } catch (Exception e) {
-            System.out.println("❌ Error updating the file.");
+
+        } catch (IOException e) {
+            System.out.println("❌ Error while updating flight data.");
         }
     }
+
 
 
 }
