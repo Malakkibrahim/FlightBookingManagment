@@ -1,198 +1,76 @@
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDateTime;
+
+import payment.IPaymentProcessor;
+import payment.PaymentDetails;
+import payment.PaymentProcessorFactory;
+import shared.*;
 
 public class Payment {
     private String paymentId;
-    private String bookingReference;
+    private String bookingReferenceNumber;
     private double amount;
-    private String method;
-    private String status;
-    private String transactionDate;
-    private static final String PAYMENTS_FILE = "payments.txt";
+    private PaymentMethod method;
+    private PaymentStatus status;
+    private LocalDateTime transactionDate;
+    private IPaymentProcessor processor;
 
-    public Payment(String paymentId, String bookingReference, double amount, String method,String satus, String transactionDate) {
+    public Payment(String paymentId, String bookingReference, double amount, PaymentMethod method, PaymentStatus status, LocalDateTime transactionDate) {
+        this(bookingReference, amount, method, status, transactionDate);
         this.paymentId = paymentId;
-        this.bookingReference = bookingReference;
-        this.amount = amount;
-        this.method = method;
         this.status = status;
-        this.transactionDate = transactionDate;
     }
 
-    public Payment(String bookingReference, double amount, String method) {
+    public Payment(String bookingReference, double amount, PaymentMethod method, PaymentStatus status, LocalDateTime transactionDate) {
         this.paymentId = "PM" + System.currentTimeMillis();
-        this.bookingReference = bookingReference;
+        this.bookingReferenceNumber = bookingReference;
         this.amount = amount;
         this.method = method;
-        this.status = "Pending";
-        this.transactionDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        this.status = PaymentStatus.SUSPENDED;
+        this.transactionDate = LocalDateTime.now();
+        this.processor = new PaymentProcessorFactory().getPaymentProcessor(this.method);
     }
 
-    public String getPaymentId() {
-        return paymentId;
-    }
-
-    public String getBookingReference() {
-        return bookingReference;
+    public String getBookingReferenceNumber() {
+        return bookingReferenceNumber;
     }
 
     public double getAmount() {
         return amount;
     }
 
-    public String getMethod() {
+    public PaymentMethod getMethod() {
         return method;
     }
 
-    public String getStatus() {
+    public PaymentStatus getStatus() {
         return status;
     }
 
-    public String getTransactionDate() {
+    public LocalDateTime getTransactionDate() {
         return transactionDate;
     }
 
-    public static String getPAYMENTS_FILE() {
-        return PAYMENTS_FILE;
-    }
-
-    public void setPaymentId(String paymentId) {
-        this.paymentId = paymentId;
-    }
-
-    public void setBookingReference(String bookingReference) {
-        this.bookingReference = bookingReference;
-    }
-
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
-    public void setStatus(String status) {
+    public void updateStatus(PaymentStatus status) {
         this.status = status;
     }
 
-    public void setTransactionDate(String transactionDate) {
-        this.transactionDate = transactionDate;
+    private boolean validatePaymentDetails(PaymentDetails details) {
+        return this.processor.processPayment(details);
     }
 
-    public String toFileString() {
-        return paymentId + "," + bookingReference + "," + amount + "," + method + "," + status + "," + transactionDate;
-    }
-
-    public static Payment fromFileString(String line) {
-        String[] parts = line.split(",");
-        if (parts.length == 6) {
-            return new Payment(parts[0], parts[1], Double.parseDouble(parts[2]), parts[3], parts[4], parts[5]);
-        }
-        return null;
-    }
-
-    public void saveToFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PAYMENTS_FILE, true))) {
-            writer.write(this.toFileString());
-            writer.newLine();
-            System.out.println("Payment saved successfully.");
-        } catch (IOException e) {
-            System.out.println(" Error saving payment.");
-        }
-    }
-
-
-    public static List<Payment> loadFromFile() {
-        List<Payment> payments = new ArrayList<>();
-        File file = new File(PAYMENTS_FILE);
-
-        if (!file.exists()) {
-            return payments; // لو الملف مش موجود بيرجع ليست فاضية
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length == 6) {
-                    String paymentId = data[0];
-                    String bookingReference = data[1];
-                    double amount = Double.parseDouble(data[2]);
-                    String method = data[3];
-                    String status = data[4];
-                    String transactionDate = data[5];
-
-                    payments.add(new Payment(paymentId, bookingReference, amount, method, status, transactionDate));
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("❌ Error loading payments: " + e.getMessage());
-        }
-
-        return payments;
-    }
-
-
-    public void updateStatus(String newStatus) {
-        this.status = newStatus;
-        updatePaymentInFile();
-    }
-    public boolean validatePaymentDetails() {
-        return amount > 0 && (method.equalsIgnoreCase("CreditCard") || method.equalsIgnoreCase("BankTransfer"));
-    }
-
-
-    public boolean processPayment() {
-        if (!validatePaymentDetails()) {
+    public boolean processPayment(PaymentDetails details) {
+        if (!validatePaymentDetails(details)) {
             System.out.println(" Invalid payment details.");
-            this.status = "Failed";
-            saveToFile();
+            this.status = PaymentStatus.FAILED;
             return false;
         }
 
-        this.status = "Paid";
-        saveToFile();
+        this.status = PaymentStatus.SUCCESS;
         return true;
-    }
-
-    private void updatePaymentInFile() {
-        try {
-            File inputFile = new File(PAYMENTS_FILE);
-            File tempFile = new File("payments_temp.txt");
-
-            BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-            BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Payment p = Payment.fromFileString(line);
-                if (p != null && p.paymentId.equals(this.paymentId)) {
-                    writer.write(this.toFileString());
-                } else {
-                    writer.write(line);
-                }
-                writer.newLine();
-            }
-
-            writer.close();
-            reader.close();
-
-            // Replace original file
-            inputFile.delete();
-            tempFile.renameTo(inputFile);
-
-        } catch (IOException e) {
-            System.out.println(" Error updating payment status in file.");
-        }
     }
 
     @Override
     public String toString() {
-        return paymentId + "," + bookingReference + "," + amount + "," + method + "," + status + "," + transactionDate;
+        return paymentId + "," + bookingReferenceNumber + "," + amount + "," + method + "," + status + "," + transactionDate;
     }
-
 }

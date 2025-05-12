@@ -1,3 +1,5 @@
+import shared.*;
+
 public class FlightSeat {
   private SeatClass seatClass;
   private double price;

@@ -1,149 +1,163 @@
 import java.util.*;
+
+import payment.*;
+import shared.PaymentMethod;
+import shared.PaymentStatus;
+
 import java.io.*;
+import java.time.LocalDateTime;
 public class BookingSystem {
-    private String usersFile = "users.txt";
-    private String flightsFile = "flights.txt";
-    private String bookingsFile = "bookings.txt";
-    private String paymentsFile = "payments.txt";
+    private List<Administrator> admins;
+    private List<Agent> agents;
+    private List<Customer> customers;
+    private List<Flight> flights;
+    private List<Booking> bookings;
+    private List<Payment> payments;
+    private List<Passenger> passengers;
+    private List<SeatSelection> seats;
 
     public BookingSystem() {
-        System.out.println("Booking System Started!");
-    }
+        admins = FileManager.loadAdmins();
+        agents = FileManager.loadAgents();
+        customers = FileManager.loadCustomers();
+        flights = FileManager.loadFlights();
+        bookings = FileManager.loadBookings();
+        payments = FileManager.loadPayments();
+        passengers = FileManager.loadPassengers();
+        seats = FileManager.loadSeatSelections();
 
-    public void searchFlights(String origin, String destination, String date) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(flightsFile))) {
-            String line;
-            boolean found = false;
+        for(Booking booking : bookings) {
+            for(Customer customer : customers) {
+                if(booking.getCustomerId() == customer.getCustomerId()) {
+                    customer.addBooking(booking);
+                    booking.setCustomer(customer);
+                }
+            }
 
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 8) {
-                    String flightNumber = parts[0];
-                    String from = parts[2];
-                    String to = parts[3];
-                    String depDate = parts[4];
-                    String time = parts[5];
-                    int seats = Integer.parseInt(parts[7]);
+            for(Flight flight : flights)
+            {
+                if(booking.getFlightNumber().equalsIgnoreCase(flight.getFlightNumber())) {
+                    booking.setFlight(flight);
+                }
+            }
 
-                    if (from.equalsIgnoreCase(origin)
-                            && to.equalsIgnoreCase(destination)
-                            && depDate.equals(date)) {
+            for(Passenger passenger : passengers) {
+                if(booking.getBookingReferenceNumber().equalsIgnoreCase(passenger.getBookingReferenceNumber())) {
+                    booking.addPassenger(passenger);
+                }
 
-                        System.out.println("✈ Flight: " + flightNumber + " | " + from + " ➡ " + to + " | Date: " + depDate + " | Time: " + time + " | Seats: " + seats);
-                        found = true;
+                for(SeatSelection seat : seats) {
+                    if(seat.getBookingReferanceNumber().equalsIgnoreCase(booking.getBookingReferenceNumber()) && 
+                    seat.getPassengerId().equals(passenger.getPassengerId())) {
+                        booking.addSeatSelection(seat);
                     }
                 }
             }
-
-            if (!found) {
-                System.out.println(" لا توجد رحلات مطابقة.");
-            }
-
-        } catch (IOException e) {
-            System.out.println(" خطأ في قراءة بيانات الرحلات.");
         }
     }
 
-
-    public void createBooking(String customerUsername, String flightNumber) {
-        String bookingRef = "BK" + System.currentTimeMillis();
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(bookingsFile, true))) {
-            writer.write(bookingRef + "," + customerUsername + "," + flightNumber + ",Reserved,Pending");
-            writer.newLine();
-            System.out.println(" تم إنشاء الحجز برقم: " + bookingRef);
-        } catch (IOException e) {
-            System.out.println(" خطأ أثناء حفظ الحجز.");
+    public List<Flight> searchFlights(String origin, String destination, LocalDateTime date) {
+        List<Flight> result = new ArrayList<>();
+        for(Flight flight : this.flights) {
+            if(flight.getOrigin().equalsIgnoreCase(origin) && 
+            flight.getDestination().equalsIgnoreCase(destination) &&
+            flight.getDepartureTime().equals(date)) {
+                result.add(flight);
+            }
         }
+        return result;
+    }
+
+    public void createBooking(Booking booking) {
+        this.bookings.add(booking);
+        FileManager.saveBooking(booking);
+    }
+
+    public void processPayment(Booking booking) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("=== Payment Processing System ===");
+        System.out.println("Select payment method:");
+        System.out.println("1. Credit Card");
+        System.out.println("2. Bank Transfer");
+        System.out.print("Enter choice (1 or 2): ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); 
+
+        Payment newPayment = null;
+        PaymentDetails paymentDetails = null;
+
+        switch (choice) {
+            case 1:
+                // Credit Card Payment
+                System.out.print("Enter card holder name: ");
+                String ccHolder = scanner.nextLine();
+                System.out.print("Enter card number (16 digits): ");
+                String ccNumber = scanner.nextLine();
+                System.out.print("Enter expiry date (MM/YY): ");
+                String ccExpiry = scanner.nextLine();
+                System.out.print("Enter CVV: ");
+                String ccCVV = scanner.nextLine();
+                System.out.print("Enter payment amount: ");
+                double ccAmount = scanner.nextDouble();
+
+                newPayment = new Payment(booking.getBookingReferenceNumber(), ccAmount, PaymentMethod.CREDITCARD, PaymentStatus.SUSPENDED, LocalDateTime.now());
+                paymentDetails = new CreditCardPaymentDetails(
+                        ccAmount, ccNumber, ccHolder, ccExpiry, ccCVV);
+                break;
+
+            case 2:
+                // Bank Transfer Payment
+                System.out.print("Enter account holder name: ");
+                String btHolder = scanner.nextLine();
+                System.out.print("Enter bank account number: ");
+                String btAccount = scanner.nextLine();
+                System.out.print("Enter bank code (8 characters): ");
+                String btBankCode = scanner.nextLine();
+                System.out.print("Enter payment reference: ");
+                String btReference = scanner.nextLine();
+                System.out.print("Enter payment amount: ");
+                double btAmount = scanner.nextDouble();
+
+                newPayment = new Payment(booking.getBookingReferenceNumber(), btAmount, PaymentMethod.BANK_TRANSFFER, PaymentStatus.SUSPENDED, LocalDateTime.now());
+                paymentDetails = new BankTransferPaymentDetails(
+                        btAmount, btAccount, btHolder, btBankCode, btReference);
+                    break;
+
+            default:
+                System.out.println("Invalid choice. Exiting.");
+                scanner.close();
+                return;
+        }
+
+        newPayment.processPayment(paymentDetails);
+        if(newPayment.getStatus() == PaymentStatus.SUCCESS) {
+            booking.confirmBooking();
+            this.saveBooking(booking, newPayment);
+            generateTicket(booking, newPayment);
+        }
+        else
+            System.out.println("Booking not connfiirmed due to failed payment transaction");
+
+        scanner.close();
     }
 
 
-    public void processPayment(String bookingRef, String method, double amount) {
-        List<String> updatedBookings = new ArrayList<>();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(bookingsFile))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts[0].equals(bookingRef)) {
-                    parts[3] = "Confirmed";
-                    parts[4] = "Paid";
-                    line = String.join(",", parts);
-                }
-                updatedBookings.add(line);
-            }
-        } catch (IOException e) {
-            System.out.println(" خطأ في قراءة الحجوزات.");
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(bookingsFile))) {
-            for (String updated : updatedBookings) {
-                writer.write(updated);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.out.println(" خطأ أثناء تحديث حالة الحجز.");
-        }
-
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(paymentsFile, true))) {
-            String paymentId = "PM" + System.currentTimeMillis();
-            writer.write(paymentId + "," + bookingRef + "," + amount + "," + method + ",Paid");
-            writer.newLine();
-            System.out.println(" تم الدفع بنجاح!");
-        } catch (IOException e) {
-            System.out.println(" خطأ أثناء حفظ الدفع.");
-        }
+    public void generateTicket(Booking booking, Payment payment) {
+        
     }
 
+    private void saveBooking(Booking booking, Payment payment) {
+        for(Passenger passenger : booking.getPassengers()) 
+            this.passengers.add(passenger);
+        for(SeatSelection seat : seats)
+            this.seats.add(seat);
+        this.bookings.add(booking);
+        this.payments.add(payment);
 
-    public void generateTicket(String bookingRef) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(bookingsFile))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts[0].equals(bookingRef)) {
-                    System.out.println(" تذكرة السفر ");
-                    System.out.println("رقم الحجز: " + parts[0]);
-                    System.out.println("العميل: " + parts[1]);
-                    System.out.println("رقم الرحلة: " + parts[2]);
-                    System.out.println("الحالة: " + parts[3]);
-                    System.out.println("الدفع: " + parts[4]);
-                    return;
-                }
-            }
-            System.out.println(" لم يتم العثور على الحجز.");
-        } catch (IOException e) {
-            System.out.println(" خطأ في قراءة التذكرة.");
-        }
-    }
-
-
-    private void updateFlightSeats(String flightNumber, int change) {
-        List<String> updatedFlights = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(flightsFile))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts[0].equals(flightNumber)) {
-                    int seats = Integer.parseInt(parts[7]);
-                    seats += change;
-                    if (seats < 0) seats = 0;  // ما ينفعش يكون بالسالب
-                    parts[7] = String.valueOf(seats);
-                    line = String.join(",", parts);
-                }
-                updatedFlights.add(line);
-            }
-        } catch (IOException e) {
-            System.out.println("  خط ف قراءة   flight.txt.");
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(flightsFile))) {
-            for (String f : updatedFlights) {
-                writer.write(f);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.out.println(" خطأ في حفظ flight.txt بعد تعديل المقاعد.");
-        }
+        FileManager.savePassengerBatch(booking.getPassengers(), false);
+        FileManager.saveSeatSelectionBatch(booking.getSeatSelections(), false);
+        FileManager.saveBooking(booking);
+        FileManager.savePayment(payment);
     }
 }

@@ -1,9 +1,7 @@
-import java.io.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.UUID;
+
+import shared.*;
 
 public class Flight {
     private String flightNumber;
@@ -16,14 +14,20 @@ public class Flight {
     private FlightSeat businessFlightSeats;
     private FlightSeat firstClassFilghtSeats;
 
-    public Flight(String flightNumber, String airline, String origin, String destination, 
-    LocalDateTime departureTime, LocalDateTime arrivalTime) {
-        this.flightNumber = flightNumber;
+    public Flight(String airline, String origin, String destination, 
+    LocalDateTime departureTime, LocalDateTime arrivalTime,
+    int availableEconomySeats, int bookedEconomySeats, double economyPrice, 
+    int availableBusinessSeats, int bookedBusinessSeats, double businessPrice,
+    int availableFirstClassSeats,  int bookedFirstClassSeats,  double firstClassPrice) {
+        this.flightNumber = this.generateFlightNumber();
         this.airline = airline;
         this.origin = origin;
         this.destination = destination;
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
+        this.economyFilghtSeats = new FlightSeat(SeatClass.ECONOMY, economyPrice, availableEconomySeats, bookedEconomySeats);
+        this.businessFlightSeats = new FlightSeat(SeatClass.BUSINESS, businessPrice, availableBusinessSeats, bookedBusinessSeats);
+        this.firstClassFilghtSeats = new FlightSeat(SeatClass.FIRST_CLASS, firstClassPrice, availableFirstClassSeats, bookedFirstClassSeats);
     }
 
     public Flight(String flightNumber, String airline, String origin, String destination, 
@@ -31,13 +35,8 @@ public class Flight {
     int availableEconomySeats, int bookedEconomySeats, double economyPrice, 
     int availableBusinessSeats, int bookedBusinessSeats, double businessPrice,
     int availableFirstClassSeats,  int bookedFirstClassSeats,  double firstClassPrice) {
-        this(flightNumber, airline, origin, destination, departureTime, arrivalTime);
-        this.economyFilghtSeats = new FlightSeat(SeatClass.Economy, economyPrice, availableEconomySeats, bookedEconomySeats);
-        businessFlightSeats = new FlightSeat(SeatClass.Business, businessPrice, availableBusinessSeats, bookedBusinessSeats);
-        this.firstClassFilghtSeats = new FlightSeat(SeatClass.FirstClass, firstClassPrice, availableFirstClassSeats, bookedFirstClassSeats);
-    }
-
-    public void setFlightNumber(String flightNumber) {
+        this(airline, origin, destination, departureTime, arrivalTime,availableEconomySeats, bookedEconomySeats,
+        economyPrice, availableBusinessSeats, bookedBusinessSeats, businessPrice, availableFirstClassSeats, bookedFirstClassSeats, firstClassPrice);
         this.flightNumber = flightNumber;
     }
 
@@ -63,17 +62,17 @@ public class Flight {
 
     public void setEconomyClassSeats(double price, int available, int booked)
     {
-        this.economyFilghtSeats = new FlightSeat(SeatClass.Economy, price, available, booked);
+        this.economyFilghtSeats = new FlightSeat(SeatClass.ECONOMY, price, available, booked);
     }
 
     public void setBusinessClassSeats(double price, int available, int booked)
     {
-        businessFlightSeats = new FlightSeat(SeatClass.Business, price, available, booked);
+        businessFlightSeats = new FlightSeat(SeatClass.BUSINESS, price, available, booked);
     }
 
     public void setFirstClassSeats(double price, int available, int booked)
     {
-        this.firstClassFilghtSeats = new FlightSeat(SeatClass.FirstClass, price, available, booked);
+        this.firstClassFilghtSeats = new FlightSeat(SeatClass.FIRST_CLASS, price, available, booked);
     }
 
     public String getAirline() {
@@ -100,68 +99,45 @@ public class Flight {
         return origin;
     }
 
-    public FlightSeat getEconomyFilghtSeats() {
-        return economyFilghtSeats;
+    public double getEconomyFilghtSeatsPrice() {
+        return economyFilghtSeats.getPrice();
     }
 
-    public FlightSeat getbusinessFlightSeats() {
-        return businessFlightSeats;
+    public double getbusinessFlightSeatsPrice() {
+        return businessFlightSeats.getPrice();
     }
 
-    public FlightSeat getFirstClassFilghtSeats() {
-        return firstClassFilghtSeats;
+    public double getFirstClassFilghtSeatsPrice() {
+        return firstClassFilghtSeats.getPrice();
     }
 
     public double calculatePrice(SeatClass seatClass, int quantity) {
         switch (seatClass) {
-            case Economy:
+            case ECONOMY:
                 return economyFilghtSeats.getPrice() * quantity;
-            case Business:
+            case BUSINESS:
                 return businessFlightSeats.getPrice() * quantity;
-            case FirstClass:
+            case FIRST_CLASS:
                 return firstClassFilghtSeats.getPrice() * quantity;
             default:
                 throw new IllegalArgumentException("This seat type is not supported");
         }
     }
 
-    // public static Flight FromFileString(String line) {
-    //     String[] parts = line.split(",");
-    //     if (parts.length == 16) {
-    //         Flight flight = new Flight();
-    //         flight.setflightNumber(parts[0]);
-    //         flight.setSeatClass(parts[1]);
-    //         flight.setairline(parts[2]);
-    //         flight.setorigin(parts[3]);
-    //         flight.setdestination(parts[4]);
-    //         flight.setdepartureTime(LocalDateTime.parse(parts[5]));
-    //         flight.setarrivalTime(LocalDateTime.parse(parts[6]));
-    //         flight.setAvailableEconomySeats(Integer.parseInt(parts[7]));
-    //         flight.setAvailableBusinessSeats(Integer.parseInt(parts[8]));
-    //         flight.setAvailableFirstClassSeats(Integer.parseInt(parts[9]));
-    //         flight.setBookedEconomySeats(Integer.parseInt(parts[10]));
-    //         flight.setBookedBusinessSeats(Integer.parseInt(parts[11]));
-    //         flight.setBookedFirstClassSeats(Integer.parseInt(parts[12]));
-    //         flight.setEconomyPrice(Double.parseDouble(parts[13]));
-    //         flight.setBusinessPrice(Double.parseDouble(parts[14]));
-    //         flight.setFirstClassPrice(Double.parseDouble(parts[15]));
-    //         return flight;
-    //     } else {
-    //         System.err.println("Error: Expected 16 parts in line but found " + parts.length + ": " + line);
-    //         return null;
-    //     }
-    // }
+    private String generateFlightNumber() {
+        return "F" + UUID.randomUUID().toString().substring(0, 4).toUpperCase();
+    }
 
-    public boolean checkAvailability(SeatClass seatClass, int quantity) {
+    private boolean checkAvailability(SeatClass seatClass, int quantity) {
         switch (seatClass) {
-            case Economy:
+            case ECONOMY:
                 return economyFilghtSeats.getAvailable() >= quantity;
-            case Business:
+            case BUSINESS:
                 return businessFlightSeats.getAvailable() >= quantity;
-            case FirstClass:
+            case FIRST_CLASS:
                 return firstClassFilghtSeats.getAvailable() >= quantity;
             default:
-                throw new IllegalArgumentException("This seat type is not supported");
+                return false;
         }
     }
 
@@ -175,14 +151,31 @@ public class Flight {
         }
 
         switch (seatClass) {
-            case Economy:
+            case ECONOMY:
                 economyFilghtSeats.book(quantity);
                 break;
-            case Business:
+            case BUSINESS:
                 businessFlightSeats.book(quantity);
                 break;
-            case FirstClass:
+            case FIRST_CLASS:
                 firstClassFilghtSeats.book(quantity);
+                break;
+            default:
+                throw new IllegalArgumentException("This seat type is not supported");
+        }
+    }
+
+    public void increaseAvailability(SeatClass seatClass, int quantity)
+    {
+        switch (seatClass) {
+            case ECONOMY:
+                economyFilghtSeats.cancel(quantity);
+                break;
+            case BUSINESS:
+                businessFlightSeats.cancel(quantity);
+                break;
+            case FIRST_CLASS:
+                firstClassFilghtSeats.cancel(quantity);
                 break;
             default:
                 throw new IllegalArgumentException("This seat type is not supported");
@@ -192,13 +185,13 @@ public class Flight {
     public void updateSeat(SeatClass seatClass, double price, int available, int booked)
     {
         switch (seatClass) {
-            case Economy:
+            case ECONOMY:
                 economyFilghtSeats.updateSeat(price, available, booked);
                 break;
-            case Business:
+            case BUSINESS:
                 businessFlightSeats.updateSeat(price, available, booked);
                 break;
-            case FirstClass:
+            case FIRST_CLASS:
                 firstClassFilghtSeats.updateSeat(price, available, booked);
                 break;
             default:
