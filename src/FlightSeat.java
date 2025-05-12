@@ -1,8 +1,8 @@
 public class FlightSeat {
-  public SeatClass seatClass;
-  public double price;
-  public int available;
-  public int booked;
+  private SeatClass seatClass;
+  private double price;
+  private int available;
+  private int booked;
 
   public FlightSeat(SeatClass seatClass, double price, int available, int booked)
   {
@@ -12,16 +12,39 @@ public class FlightSeat {
     this.booked =  booked; 
   }
 
-  public void book()
-  {
-    this.available -= 1;
-    this.booked += 1;
-  }  
+  public SeatClass getSeatClass() {
+    return seatClass;
+  }
 
-  public void cancel() 
+  public double getPrice() {
+    return price;
+  }
+
+  public int getAvailable() {
+    return available;
+  }
+
+  public int getBooked() {
+    return booked;
+  }
+
+  public void book(int quantity)
   {
-    this.available += 1;
-    this.booked -= 1;
+    this.available -= quantity;
+    this.booked += quantity;
+  } 
+
+  public void cancel(int quantity) 
+  {
+    this.available += quantity;
+    this.booked -= quantity;
+  }
+
+  public void updateSeat(double price, int available, int booked)
+  {
+    this.price = price;
+    this.available = available;
+    this.booked = booked;
   }
 
   @Override
