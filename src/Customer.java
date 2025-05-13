@@ -1,6 +1,7 @@
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.UUID;
 
 import shared.Role;
@@ -54,14 +55,13 @@ public class Customer extends User {
     }
 
     public void showMenu(){
-        System.out.println("---- Customer Menu ----");
-        System.out.println("1. Search for a flight");
-        System.out.println("2. Modify System Settings");
-        System.out.println("3. View System Logs");
-        System.out.println("4. Manage User Access");
-        System.out.println("5. Update Profile");
-        System.out.println("6. Logout");
-        System.out.print("Enter your choice: ");
+        System.out.println("\n--- Customer Dashboard ---");
+        System.out.println("Welcome, " + getName() + "!");
+        System.out.println("\nChoose an action:");
+        System.out.println("1. Search Flights");
+        System.out.println("2. View My Bookings");
+        System.out.println("3. Cancel Booking");
+        System.out.println("4. Logout");
     }
 
     public Flight searcFlights() {

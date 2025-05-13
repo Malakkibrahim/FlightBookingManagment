@@ -17,45 +17,53 @@ public class BookingSystem {
     private List<SeatSelection> seats;
     private Scanner scanner = new Scanner(System.in);
 
-    public BookingSystem() {
+    private static BookingSystem instance;
+
+    private BookingSystem() {
         admins = FileManager.loadAdmins();
         agents = FileManager.loadAgents();
         customers = FileManager.loadCustomers();
-        // flights = FileManager.loadFlights();
-        // bookings = FileManager.loadBookings();
-        // payments = FileManager.loadPayments();
-        // passengers = FileManager.loadPassengers();
-        // seats = FileManager.loadSeatSelections();
+        flights = FileManager.loadFlights();
+        bookings = FileManager.loadBookings();
+        payments = FileManager.loadPayments();
+        passengers = FileManager.loadPassengers();
+        seats = FileManager.loadSeatSelections();
 
-        // for(Booking booking : bookings) {
-        //     for(Customer customer : customers) {
-        //         if(booking.getCustomerId() == customer.getCustomerId()) {
-        //             customer.addBooking(booking);
-        //             booking.setCustomer(customer);
-        //         }
-        //     }
+        for(Booking booking : bookings) {
+            for(Customer customer : customers) {
+                if(booking.getCustomerId() == customer.getCustomerId()) {
+                    customer.addBooking(booking);
+                    booking.setCustomer(customer);
+                }
+            }
 
-        //     for(Flight flight : flights)
-        //     {
-        //         if(booking.getFlightNumber().equalsIgnoreCase(flight.getFlightNumber())) {
-        //             booking.setFlight(flight);
-        //         }
-        //     }
+            for(Flight flight : flights)
+            {
+                if(booking.getFlightNumber().equalsIgnoreCase(flight.getFlightNumber())) {
+                    booking.setFlight(flight);
+                }
+            }
 
-        //     for(Passenger passenger : passengers) {
-        //         if(booking.getBookingReferenceNumber().equalsIgnoreCase(passenger.getBookingReferenceNumber())) {
-        //             booking.addPassenger(passenger);
-        //         }
+            for(Passenger passenger : passengers) {
+                if(booking.getBookingReferenceNumber().equalsIgnoreCase(passenger.getBookingReferenceNumber())) {
+                    booking.addPassenger(passenger);
+                }
 
-        //         for(SeatSelection seat : seats) {
-        //             if(seat.getBookingReferanceNumber().equalsIgnoreCase(booking.getBookingReferenceNumber()) && 
-        //             seat.getPassengerId().equals(passenger.getPassengerId())) {
-        //                 booking.addSeatSelection(seat);
-        //             }
-        //         }
-        //     }
-        // }
-        Login();
+                for(SeatSelection seat : seats) {
+                    if(seat.getBookingReferanceNumber().equalsIgnoreCase(booking.getBookingReferenceNumber()) && 
+                    seat.getPassengerId().equals(passenger.getPassengerId())) {
+                        booking.addSeatSelection(seat);
+                    }
+                }
+            }
+        }
+    }
+
+    public static BookingSystem getInstance() {
+        if (instance == null) {
+            instance = new BookingSystem();
+        }
+        return instance;
     }
 
     public void Login() {
@@ -181,7 +189,7 @@ public class BookingSystem {
         
     }
 
-    private void saveBooking(Booking booking, Payment payment) {
+    public void saveBooking(Booking booking, Payment payment) {
         for(Passenger passenger : booking.getPassengers()) 
             this.passengers.add(passenger);
         for(SeatSelection seat : seats)
@@ -193,5 +201,10 @@ public class BookingSystem {
         FileManager.saveSeatSelectionBatch(booking.getSeatSelections(), false);
         FileManager.saveBooking(booking);
         FileManager.savePayment(payment);
+    }
+
+    public void saveFlight(Flight flight) {
+        this.flights.add(flight);
+        FileManager.saveFlight(flight);
     }
 }

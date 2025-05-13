@@ -1,3 +1,6 @@
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import shared.*;
 
@@ -51,9 +54,9 @@ public class Agent extends User {
         System.out.println("4. Generate Reports");
         System.out.println("5. Update Profile");
         System.out.println("6. Logout");
+        // Scanner scanner = new Scanner(System.in);
         // int choice = scanner.nextInt();
-        // scanner.nextLine(); // Consume newline
-
+        // scanner.nextLine();
         // switch (choice) {
         //     case 1:
         //         manageFlights();
@@ -80,7 +83,6 @@ public class Agent extends User {
         //         showMenu();
         //         break;
         // }
-
     }
 
     public void manageFlights() {
@@ -91,6 +93,7 @@ public class Agent extends User {
         System.out.println("3. Remove Flight"); // external with exception if there's any booking
         System.out.println("4. View All Flights"); // external
         System.out.println("5. Back to Menu");
+        // Scanner scanner = new Scanner(System.in);
         // int choice = scanner.nextInt();
         // scanner.nextLine();
 
@@ -117,8 +120,83 @@ public class Agent extends User {
         // }
     }
 
+    public void CreateFlight() {
+        Scanner scanner = new Scanner(System.in);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+        System.out.println("=== Flight Data Entry ===");
 
+        System.out.print("Enter airline name: ");
+        String airline = scanner.nextLine();
+
+        System.out.print("Enter origin airport/city: ");
+        String origin = scanner.nextLine();
+
+        System.out.print("Enter destination airport/city: ");
+        String destination = scanner.nextLine();
+
+        LocalDateTime departureTime = null;
+        while (departureTime == null) {
+            System.out.print("Enter departure date and time (yyyy-MM-dd HH:mm): ");
+            String depInput = scanner.nextLine();
+            try {
+                departureTime = LocalDateTime.parse(depInput, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid format. Please use yyyy-MM-dd HH:mm (e.g., 2025-05-13 14:30)");
+            }
+        }
+
+        LocalDateTime arrivalTime = null;
+        while (arrivalTime == null) {
+            System.out.print("Enter arrival date and time (yyyy-MM-dd HH:mm): ");
+            String arrInput = scanner.nextLine();
+            try {
+                arrivalTime = LocalDateTime.parse(arrInput, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid format. Please use yyyy-MM-dd HH:mm (e.g., 2025-05-13 18:45)");
+            }
+        }
+
+        System.out.print("Enter available Economy seats: ");
+        int availableEconomySeats = scanner.nextInt();
+        System.out.print("Enter booked Economy seats: ");
+        int bookedEconomySeats = scanner.nextInt();
+        System.out.print("Enter Economy seat price: ");
+        double economyPrice = scanner.nextDouble();
+
+        System.out.print("Enter available Business seats: ");
+        int availableBusinessSeats = scanner.nextInt();
+        System.out.print("Enter booked Business seats: ");
+        int bookedBusinessSeats = scanner.nextInt();
+        System.out.print("Enter Business seat price: ");
+        double businessPrice = scanner.nextDouble();
+
+        System.out.print("Enter available First Class seats: ");
+        int availableFirstClassSeats = scanner.nextInt();
+        System.out.print("Enter booked First Class seats: ");
+        int bookedFirstClassSeats = scanner.nextInt();
+        System.out.print("Enter First Class seat price: ");
+        double firstClassPrice = scanner.nextDouble();
+
+        scanner.close();
+
+        System.out.println("\n=== Flight Data Summary ===");
+        System.out.printf("%-18s: %s%n", "Airline", airline);
+        System.out.printf("%-18s: %s%n", "Origin", origin);
+        System.out.printf("%-18s: %s%n", "Destination", destination);
+        System.out.printf("%-18s: %s%n", "Departure", departureTime.format(formatter));
+        System.out.printf("%-18s: %s%n", "Arrival", arrivalTime.format(formatter));
+        System.out.printf("%-18s: %d available, %d booked, $%.2f each%n", "Economy Seats", availableEconomySeats, bookedEconomySeats, economyPrice);
+        System.out.printf("%-18s: %d available, %d booked, $%.2f each%n", "Business Seats", availableBusinessSeats, bookedBusinessSeats, businessPrice);
+        System.out.printf("%-18s: %d available, %d booked, $%.2f each%n", "First Class Seats", availableFirstClassSeats, bookedFirstClassSeats, firstClassPrice);
+
+        Flight flight = new Flight(airline, origin, destination, departureTime, arrivalTime,
+        availableEconomySeats, bookedEconomySeats, economyPrice, 
+        availableBusinessSeats, bookedBusinessSeats, businessPrice,
+        availableFirstClassSeats, bookedFirstClassSeats,  firstClassPrice);
+
+        BookingSystem.getInstance().saveFlight(flight);
+    }
 
     // search for the customer (assuming existance)
     // public Booking createBookingForCustomer(Customer customer, Flight flight) {
