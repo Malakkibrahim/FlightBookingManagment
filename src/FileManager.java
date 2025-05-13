@@ -18,7 +18,7 @@ public class FileManager {
 
     private static final String ADMIN_FILE = BASE + "administrators.txt";
     private static final String AGENT_FILE = BASE + "agents.txt";
-    private static final String CUSTOMER_FILE = BASE + "agents.txt";
+    private static final String CUSTOMER_FILE = BASE + "customers.txt";
 
     private static final String FLIGHT_FILE = BASE + "flight.txt";
     private static final String BOOKING_FILE = BASE + "booking.txt";
