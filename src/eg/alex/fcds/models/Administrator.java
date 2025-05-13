@@ -1,4 +1,5 @@
 package eg.alex.fcds.models;
+
 import java.util.*;
 
 import javax.management.relation.InvalidRoleValueException;
@@ -7,158 +8,73 @@ import eg.alex.fcds.BookingSystem;
 import eg.alex.fcds.models.shared.Role;
 import eg.alex.fcds.models.shared.SecurityLevel;
 import eg.alex.fcds.models.shared.UserStatus;
+import eg.alex.fcds.view.Console;
 
 public class Administrator extends User {
     private UUID adminId;
     private SecurityLevel securityLevel;
 
-    public Administrator(UUID adminId, SecurityLevel securityLevel, UUID userId, String username, String password, 
-    String name, String email, String contactInfo, UserStatus status) {
+    public Administrator(UUID adminId, SecurityLevel securityLevel, UUID userId, String username, String password,
+            String name, String email, String contactInfo, UserStatus status) {
         super(userId, username, password, name, email, contactInfo, Role.ADMINSTRITOR, status);
         this.adminId = adminId;
     }
 
-    public Administrator(SecurityLevel securityLevel, String username, String password, String name, String email, String contactInfo)
-    {
+    public Administrator(SecurityLevel securityLevel, String username, String password, String name, String email,
+            String contactInfo) {
         super(username, password, name, email, contactInfo, Role.ADMINSTRITOR);
         this.adminId = UUID.randomUUID();
         this.securityLevel = securityLevel;
     }
-Scanner scanner = new Scanner(System.in);
+
     @Override
-    public void showMenu(){
-        System.out.println("---- Administrator Menu ----");
-        System.out.println("1. Create New User");
-        System.out.println("2. Modify System Settings");
-        System.out.println("3. View System Logs");
-        System.out.println("4. Manage User Access");
-        System.out.print("Enter your choice: ");
-        int rkm  = scanner.nextInt();
+    public void showMenu() {
+        List<String> mainMenu = new ArrayList<>() {
+            {
+                add("Create New User");
+                add("Modify System Settings");
+                add("View System Logs");
+                add("Manage User Access");
+            }
+        };
+        int choice = Console.displayMenu("Adminstrator Menu", mainMenu);
 
-        switch (rkm) {
-           case 1:
-        scanner.nextLine(); 
-        System.out.println("Enter the type of user you want to create (admin/agent/customer): ");
-        String type = scanner.nextLine().trim().toLowerCase();
-
-        System.out.print("Enter username: ");
-        String username = scanner.nextLine();
-        System.out.print("Enter password: ");
-        String password = scanner.nextLine();
-        System.out.print("Enter name: ");
-        String name = scanner.nextLine();
-        System.out.print("Enter email: ");
-        String email = scanner.nextLine();
-        System.out.print("Enter contact info: ");
-        String contactInfo = scanner.nextLine();
-
-        User newUser = null;
-
-        switch (type) {
-            case "admin":
-                System.out.print("Enter security level (HIGH, MEDUIM, LOW): ");
-        String levelStr = scanner.nextLine().trim().toUpperCase();
-
-        SecurityLevel level;
-        try {
-            level = SecurityLevel.valueOf(levelStr);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Invalid security level entered. Defaulting to LOW.");
-            level = SecurityLevel.LOW;
-        }
-
-        newUser = new Administrator(level, username, password, name, email, contactInfo);
-        BookingSystem.getInstance().getAdmins().add((Administrator) newUser);
-        System.out.println("Administrator created successfully!");
-        break;
-
-            case "agent":
-                System.out.print("Enter department: ");
-                String department = scanner.nextLine();
-                System.out.print("Enter commission: ");
-                double commission = scanner.nextDouble();
-                scanner.nextLine(); 
-                newUser = CreateAgent(department, commission, username, password, name, email, contactInfo);
-                BookingSystem.getInstance().getAgents().add((Agent) newUser);
-                System.out.println("Agent created successfully!");
+        /*
+         * USER Type
+         * [1] admin
+         * [2] agent
+         * [3] customer
+         * Enter user role
+         * Role:
+         */
+        switch (choice) {
+            case 1:
+                int roleChoice = Console.displayMenu("User Role", List.of("admin", "agent", "customer"));
+                Role newUserRole = null;
+                if(roleChoice == 1)
+                    newUserRole = Role.ADMINSTRITOR;
+                else if(roleChoice == 2)
+                    newUserRole = Role.AGENT;
+                else
+                    newUserRole = Role.CUSTOMER;
+                
+                this.createUser(newUserRole);
                 break;
-
-            case "customer":
-                System.out.print("Enter address: ");
-                String address = scanner.nextLine();
-                System.out.print("Enter preference: ");
-                String preference = scanner.nextLine();
-                newUser = CreateCustomer(address, preference, username, password, name, email, contactInfo);
-                BookingSystem.getInstance().getCustomers().add((Customer) newUser);
-                System.out.println("Customer created successfully!");
+            case 2:
+                this.modifySystemSettings();
                 break;
-
-            default:
-                System.out.println("Invalid user type!");
-                break;
-}
-        break;
-        case 2 :
-        System.out.println("Enter number of system settings to modify: ");
-                int count = scanner.nextInt();
-                scanner.nextLine(); 
-                Map<String, String> updates = new HashMap<>();
-
-                for (int i = 0; i < count; i++) {
-                    System.out.print("Enter setting key: ");
-                    String key = scanner.nextLine();
-                    System.out.print("Enter new value: ");
-                    String value = scanner.nextLine();
-                    updates.put(key, value);
-                }
-
-                modifySystemSettings(updates);
-                System.out.println("System settings updated successfully.");
-                break;
-
             case 3:
-                System.out.println("System Logs:");
-                viewSystemLogs();
+                this.viewSystemLogs();
                 break;
-
             case 4:
-                System.out.print("Enter username of user to modify: ");
-                String targetUsername = scanner.nextLine();
-                User targetUser = null;
-
-                // Search in agents
-                for (Agent agent : BookingSystem.getInstance().getAgents()) {
-                    if (agent.getUsername().equals(targetUsername)) {
-                        targetUser = agent;
-                        break;
-                    }
-                }
-
-                // If not found, search in customers
-                if (targetUser == null) {
-                    for (Customer customer : BookingSystem.getInstance().getCustomers()) {
-                        if (customer.getUsername().equals(targetUsername)) {
-                            targetUser = customer;
-                            break;
-                        }
-                    }
-                }
-
-                if (targetUser == null) {
-                    System.out.println("User not found.");
-                    break;
-                }
-
-                System.out.print("Do you want to (1) Activate or (2) Deactivate this user? ");
-                int action = scanner.nextInt();
-                scanner.nextLine(); // Clear newline
-
+                String username = Console.displayForm("Enter user name", List.of("username")).get(0);
+                int activationChoice = Console.displayMenu("Activation options", List.of("activate", "deactivate"));
                 try {
-                    manageUserAccess(targetUser, action == 1);
-                    System.out.println("User access updated successfully.");
-                } catch (InvalidRoleValueException e) {
-                    System.out.println(e.getMessage());
+                    this.manageUserAccess(username, activationChoice == 1);
+                } catch(Exception e) {
+                    Console.printInline(e.getMessage());
                 }
+
                 break;
 
             default:
@@ -168,47 +84,119 @@ Scanner scanner = new Scanner(System.in);
         System.out.println();
     }
 
-    
-
-
-
-    // private User CreateAdminstrator( SecurityLevel level ,String username, String password, String name, String email, String contactInfo)
-    // {
-    //     return new Administrator(SecurityLevel.LOW, username, password, name, email, contactinfo);
-    // }
-
-    private User CreateAgent(String department, double commision, String username, String password, String name, String email, String contactInfo)
-    {
-        return new Agent(username, password, name, email, contactinfo, department, commision);
+    /*
+     * Enter User Info
+     * username: kamal
+     * password: kamal9
+     * name: mahmoud
+     * email: mk@gmail.com
+     * contact info: fdfspoj
+     * 
+     * responses = [kamal, kamal9, mahmoud, ....]
+     */
+    private void createUser(Role userRole) {
+        List<String> responses = Console.displayForm("Enter User Info",
+                List.of("username", "password", "name", "email", "contact info"));
+        if (userRole == Role.ADMINSTRITOR)
+            CreateAdminstrator(responses);
+        else if (userRole == Role.AGENT)
+            CreateAgent(responses);
+        else
+            CreateCustomer(responses);
     }
 
-    private User CreateCustomer(String address, String preferance, String username, String password, String name, String email, String contactInfo)
-    {
-        return new Customer(username, password, name, email, contactinfo, address, preferance);
+    private void CreateAdminstrator(List<String> userInfo) {
+        Console.displayMenu("Adminstrator Security Levels", List.of("high", "meduim", "low"));
+        SecurityLevel level = null;
+        while (level == null) {
+            String securityLevel = Console.displayForm("Enter Adminstrator Info", List.of("security level")).get(0)
+                    .trim().toUpperCase();
+            try {
+                level = SecurityLevel.valueOf(securityLevel);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid security level entered. Try again!");
+            }
+        }
+
+        String username = userInfo.get(0);
+        String password = userInfo.get(1);
+        String name = userInfo.get(2);
+        String email = userInfo.get(3);
+        String contactInfo = userInfo.get(4);
+
+        Administrator administrator = new Administrator(level, username, password, name, email, contactInfo);
+        BookingSystem.getInstance().saveAdminstrator(administrator);
     }
 
-    public void viewSystemLogs() 
-    {
+    private void CreateAgent(List<String> userInfo) {
+        List<String> responses = Console.displayForm("Enter Agent Info", List.of("department", "commission"));
+        String username = userInfo.get(0);
+        String password = userInfo.get(1);
+        String name = userInfo.get(2);
+        String email = userInfo.get(3);
+        String contactInfo = userInfo.get(4);
+        String department = responses.get(0);
+        double commision = Double.parseDouble(responses.get(1));
+
+        Agent agent = new Agent(username, password, name, email, contactInfo, department, commision);
+        BookingSystem.getInstance().saveAgent(agent);
+    }
+
+    private void CreateCustomer(List<String> userInfo) {
+        List<String> responses = Console.displayForm("Enter Customer Info", List.of("address", "prefernces"));
+        String username = userInfo.get(0);
+        String password = userInfo.get(1);
+        String name = userInfo.get(2);
+        String email = userInfo.get(3);
+        String contactInfo = userInfo.get(4);
+        String address = responses.get(0);
+        String prefernces = responses.get(1);
+
+        Customer customer = new Customer(username, password, name, email, contactInfo, address, prefernces);
+        BookingSystem.getInstance().saveCustomer(customer);
+    }
+
+    public void viewSystemLogs() {
         FileManager.readLogs();
     }
 
-    public void modifySystemSettings(Map<String, String> updates) {
-        FileManager.updateSystemSettings(updates);
+    public void modifySystemSettings() {
+        Scanner scanner = new Scanner(System.in);
+        Map<String, String> settings = new HashMap<>();
+        System.out.println("Enter settings in format key=value");
+
+        String input = scanner.nextLine();
+        while(!input.equals("")) {
+            String[] settingItem = input.split("=");
+            if(settingItem.length != 2) {
+                Console.printInline("The previous setting is incorrect");
+            } else {
+                settings.put(settingItem[0], settingItem[1]);
+            }
+            input = scanner.nextLine();
+        } 
+        scanner.close();
+        FileManager.updateSystemSettings(settings);
     }
 
-    public void manageUserAccess(User user, boolean activate) throws InvalidRoleValueException {
-        if (user.getRole() == Role.ADMINSTRITOR)
+    public void manageUserAccess(String username, boolean activate) throws InvalidRoleValueException {
+        BookingSystem system = BookingSystem.getInstance();
+        
+        User user = system.searchUser(username);
+        if (user == null || user.getRole() == Role.ADMINSTRITOR)
             throw new InvalidRoleValueException("You tried to change a user with administrator role");
-    
+
         if (activate) {
             user.activate();
         } else {
             user.deActivate();
         }
+
+        system.updateUsers(user.getRole());
     }
 
     @Override
     public String toString() {
         return adminId + "," + securityLevel + "," + super.toString();
     }
-    }
+}

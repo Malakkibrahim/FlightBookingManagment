@@ -60,6 +60,7 @@ public class BookingSystem {
                 }
             }
         }
+        this.login();
     }
 
     public static BookingSystem getInstance() {
@@ -69,36 +70,41 @@ public class BookingSystem {
         return instance;
     }
 
-    public void Login() {
+    public void login() {
         System.out.println("=== User Login ===");
         System.out.print("Please enter your username: ");
         String username = scanner.nextLine();
 
         System.out.print("Please enter your password: ");
-        String password = Utils.hashPassword(scanner.nextLine());
+        String password = scanner.nextLine();
         
+        User user = null;
         for(Administrator admin : admins) {
-            if(admin.username.equals(username) && admin.password.equals(password))
-                currentUser = admin;
+            if(admin.getUsername().equals(username))
+                user = admin;
         }
         
-        if(currentUser == null) {
+        if(user == null) {
             for(Agent agent : agents) {
-                if(agent.username.equals(username) && agent.password.equals(password))
-                    currentUser = agent;
+                if(agent.getUsername().equals(username))
+                    user = agent;
             }
         }
 
-        if(currentUser == null) {
+        if(user == null) {
             for(Customer customer : customers) {
-                if(customer.username.equals(username) && customer.password.equals(password))
-                    currentUser = customer;
+                if(customer.getUsername().equals(username))
+                user = customer;
             }
         }
 
-        if(currentUser == null)
-            throw new SecurityException("You Entered Invalid Credentials, please check and try again!");
-        currentUser.showMenu();
+        if(user == null || !user.validatePassword(password)) {
+            System.out.println("User not found");
+            login();
+        } else {
+            currentUser = user;
+            user.showMenu();
+        }
     }
 
     public List<Flight> searchFlights(String origin, String destination, LocalDateTime date) {
@@ -111,6 +117,29 @@ public class BookingSystem {
             }
         }
         return result;
+    }
+
+    public User searchUser(String username) {
+        User user = null;
+
+        for(Administrator admin : admins) {
+            if(admin.getUsername().equals(username))
+                user = admin;
+        }
+        if(currentUser == null) {
+            for(Agent agent : agents) {
+                if(agent.getUsername().equals(username))
+                    user = agent;
+            }
+        }
+        if(currentUser == null) {
+            for(Customer customer : customers) {
+                if(customer.getUsername().equals(username))
+                    user = customer;
+            }
+        }
+
+        return user;
     }
 
     public void createBooking(Booking booking) {
@@ -208,5 +237,60 @@ public class BookingSystem {
     public void saveFlight(Flight flight) {
         this.flights.add(flight);
         FileManager.saveFlight(flight);
+    }
+
+    public void saveAdminstrator(Administrator administrator) {
+        this.admins.add(administrator);
+        FileManager.saveAdmin(administrator);
+    }
+
+    public void saveAgent(Agent agent) {
+        this.agents.add(agent);
+        FileManager.saveAgent(agent);
+    }
+
+    public void saveCustomer(Customer customer) {
+        this.customers.add(customer);
+        FileManager.saveCustomer(customer);
+    }
+
+    public void updateUsers(Role userRole) {
+        if(userRole == Role.ADMINSTRITOR)
+            FileManager.saveAdminBatch(this.admins, true);
+        else if(userRole == Role.AGENT)
+            FileManager.saveAgentBatch(this.agents, true);
+        else
+            FileManager.saveCustomerBatch(this.customers, true);
+    }
+
+    public Flight getFlightByNumber(String flightNumber) {
+        for(Flight flight : flights) {
+            if(flight.getFlightNumber().equalsIgnoreCase(flightNumber))
+                return flight;
+        }
+        return null;
+    }
+
+    public void updateFlight() {
+        FileManager.saveFlightBatch(this.flights, true);
+    }
+
+    public void removeFlight(String flightNumber) {
+        int removedFlightIndex = -1;
+        for(int i = 0; i < this.flights.size(); ++i) {
+            if(this.flights.get(i).getFlightNumber() == flightNumber)
+                removedFlightIndex = i;
+        }
+
+        if(removedFlightIndex != -1) {
+            this.flights.remove(removedFlightIndex);
+            FileManager.saveFlightBatch(this.flights, true);
+        }
+    }
+
+    public void printFlights() {
+        for(Flight flight : flights) {
+            System.out.println(flight);
+        }
     }
 }

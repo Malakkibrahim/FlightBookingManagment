@@ -46,11 +46,10 @@ public class FlightSeat {
     this.booked -= quantity;
   }
 
-  public void updateSeat(double price, int available, int booked)
+  public void updateSeat(double price, int available)
   {
     this.price = price;
     this.available = available;
-    this.booked = booked;
   }
 
   @Override

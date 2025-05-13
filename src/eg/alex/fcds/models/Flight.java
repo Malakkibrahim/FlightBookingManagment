@@ -1,7 +1,6 @@
 package eg.alex.fcds.models;
+
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import eg.alex.fcds.models.shared.*;
@@ -16,33 +15,34 @@ public class Flight {
     private FlightSeat economyFilghtSeats;
     private FlightSeat businessFlightSeats;
     private FlightSeat firstClassFilghtSeats;
-    List<Flight> flights = new ArrayList<>();
-List<Booking> bookings = new ArrayList<>();
 
-
-    public Flight(String airline, String origin, String destination, 
-    LocalDateTime departureTime, LocalDateTime arrivalTime,
-    int availableEconomySeats, int bookedEconomySeats, double economyPrice, 
-    int availableBusinessSeats, int bookedBusinessSeats, double businessPrice,
-    int availableFirstClassSeats,  int bookedFirstClassSeats,  double firstClassPrice) {
+    public Flight(String airline, String origin, String destination,
+            LocalDateTime departureTime, LocalDateTime arrivalTime,
+            int availableEconomySeats, int bookedEconomySeats, double economyPrice,
+            int availableBusinessSeats, int bookedBusinessSeats, double businessPrice,
+            int availableFirstClassSeats, int bookedFirstClassSeats, double firstClassPrice) {
         this.flightNumber = this.generateFlightNumber();
         this.airline = airline;
         this.origin = origin;
         this.destination = destination;
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
-        this.economyFilghtSeats = new FlightSeat(SeatClass.ECONOMY, economyPrice, availableEconomySeats, bookedEconomySeats);
-        this.businessFlightSeats = new FlightSeat(SeatClass.BUSINESS, businessPrice, availableBusinessSeats, bookedBusinessSeats);
-        this.firstClassFilghtSeats = new FlightSeat(SeatClass.FIRST_CLASS, firstClassPrice, availableFirstClassSeats, bookedFirstClassSeats);
+        this.economyFilghtSeats = new FlightSeat(SeatClass.ECONOMY, economyPrice, availableEconomySeats,
+                bookedEconomySeats);
+        this.businessFlightSeats = new FlightSeat(SeatClass.BUSINESS, businessPrice, availableBusinessSeats,
+                bookedBusinessSeats);
+        this.firstClassFilghtSeats = new FlightSeat(SeatClass.FIRST_CLASS, firstClassPrice, availableFirstClassSeats,
+                bookedFirstClassSeats);
     }
 
-    public Flight(String flightNumber, String airline, String origin, String destination, 
-    LocalDateTime departureTime, LocalDateTime arrivalTime,
-    int availableEconomySeats, int bookedEconomySeats, double economyPrice, 
-    int availableBusinessSeats, int bookedBusinessSeats, double businessPrice,
-    int availableFirstClassSeats,  int bookedFirstClassSeats,  double firstClassPrice) {
-        this(airline, origin, destination, departureTime, arrivalTime,availableEconomySeats, bookedEconomySeats,
-        economyPrice, availableBusinessSeats, bookedBusinessSeats, businessPrice, availableFirstClassSeats, bookedFirstClassSeats, firstClassPrice);
+    public Flight(String flightNumber, String airline, String origin, String destination,
+            LocalDateTime departureTime, LocalDateTime arrivalTime,
+            int availableEconomySeats, int bookedEconomySeats, double economyPrice,
+            int availableBusinessSeats, int bookedBusinessSeats, double businessPrice,
+            int availableFirstClassSeats, int bookedFirstClassSeats, double firstClassPrice) {
+        this(airline, origin, destination, departureTime, arrivalTime, availableEconomySeats, bookedEconomySeats,
+                economyPrice, availableBusinessSeats, bookedBusinessSeats, businessPrice, availableFirstClassSeats,
+                bookedFirstClassSeats, firstClassPrice);
         this.flightNumber = flightNumber;
     }
 
@@ -66,18 +66,15 @@ List<Booking> bookings = new ArrayList<>();
         this.origin = origin;
     }
 
-    public void setEconomyClassSeats(double price, int available, int booked)
-    {
+    public void setEconomyClassSeats(double price, int available, int booked) {
         this.economyFilghtSeats = new FlightSeat(SeatClass.ECONOMY, price, available, booked);
     }
 
-    public void setBusinessClassSeats(double price, int available, int booked)
-    {
+    public void setBusinessClassSeats(double price, int available, int booked) {
         businessFlightSeats = new FlightSeat(SeatClass.BUSINESS, price, available, booked);
     }
 
-    public void setFirstClassSeats(double price, int available, int booked)
-    {
+    public void setFirstClassSeats(double price, int available, int booked) {
         this.firstClassFilghtSeats = new FlightSeat(SeatClass.FIRST_CLASS, price, available, booked);
     }
 
@@ -109,12 +106,24 @@ List<Booking> bookings = new ArrayList<>();
         return economyFilghtSeats.getPrice();
     }
 
-    public double getbusinessFlightSeatsPrice() {
+    public double getBusinessFlightSeatsPrice() {
         return businessFlightSeats.getPrice();
     }
 
     public double getFirstClassFilghtSeatsPrice() {
         return firstClassFilghtSeats.getPrice();
+    }
+
+    public int getEconomyFilghtSeatsAvailability() {
+        return economyFilghtSeats.getAvailable();
+    }
+
+    public int getBusinessFlightSeatsAvailability() {
+        return businessFlightSeats.getAvailable();
+    }
+
+    public int getFirstClassFilghtSeatsAvailability() {
+        return firstClassFilghtSeats.getAvailable();
     }
 
     public double calculatePrice(SeatClass seatClass, int quantity) {
@@ -147,19 +156,8 @@ List<Booking> bookings = new ArrayList<>();
         }
     }
 
-   public Flight findFlightByNumber(String flightNumber) {
-    for (Flight flight : flights) {
-        if (flight.getFlightNumber().equalsIgnoreCase(flightNumber)) {
-            return flight;
-        }
-    }
-    return null;
-}
-
-
-
     public void reserveSeat(SeatClass seatClass) {
-        this.reserveSeats(seatClass,1);
+        this.reserveSeats(seatClass, 1);
     }
 
     public void reserveSeats(SeatClass seatClass, int quantity) {
@@ -182,8 +180,7 @@ List<Booking> bookings = new ArrayList<>();
         }
     }
 
-    public void increaseAvailability(SeatClass seatClass, int quantity)
-    {
+    public void increaseAvailability(SeatClass seatClass, int quantity) {
         switch (seatClass) {
             case ECONOMY:
                 economyFilghtSeats.cancel(quantity);
@@ -199,21 +196,30 @@ List<Booking> bookings = new ArrayList<>();
         }
     }
 
-    public void updateSeat(SeatClass seatClass, double price, int available, int booked)
-    {
+    public void updateSeat(SeatClass seatClass, double price, int available) {
         switch (seatClass) {
             case ECONOMY:
-                economyFilghtSeats.updateSeat(price, available, booked);
+                economyFilghtSeats.updateSeat(price, available);
                 break;
             case BUSINESS:
-                businessFlightSeats.updateSeat(price, available, booked);
+                businessFlightSeats.updateSeat(price, available);
                 break;
             case FIRST_CLASS:
-                firstClassFilghtSeats.updateSeat(price, available, booked);
+                firstClassFilghtSeats.updateSeat(price, available);
                 break;
             default:
                 throw new IllegalArgumentException("This seat type is not supported");
         }
+    }
+
+    public void update(LocalDateTime departureTime, LocalDateTime arrivalTime, double economyPrice,
+            int economyAvailability,
+            double businessPrice, int businessAvailability, double firstClassPrice, int firstClassAvailability) {
+        this.departureTime = departureTime;
+        this.arrivalTime = arrivalTime;
+        this.economyFilghtSeats.updateSeat(economyPrice, economyAvailability);
+        this.businessFlightSeats.updateSeat(businessPrice, businessAvailability);
+        this.firstClassFilghtSeats.updateSeat(firstClassPrice, firstClassAvailability);
     }
 
     @Override
@@ -230,9 +236,8 @@ List<Booking> bookings = new ArrayList<>();
                 businessFlightSeats.getPrice() + "," +
                 businessFlightSeats.getAvailable() + "," +
                 businessFlightSeats.getBooked() + "," +
-                firstClassFilghtSeats.getPrice()  + "," +
+                firstClassFilghtSeats.getPrice() + "," +
                 firstClassFilghtSeats.getAvailable() + "," +
                 firstClassFilghtSeats.getBooked();
     }
 }
-

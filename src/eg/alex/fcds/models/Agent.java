@@ -5,24 +5,27 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
+import javax.management.OperationsException;
+
 import eg.alex.fcds.BookingSystem;
 import eg.alex.fcds.models.shared.*;
+import eg.alex.fcds.view.Console;
 
 public class Agent extends User {
     private UUID agentID;
     private String department;
     private double commision;
 
-    public Agent(UUID agentID, String department, double commision, UUID userId, String username, 
-    String password, String name, String email, String contactinfo, UserStatus status) {
+    public Agent(UUID agentID, String department, double commision, UUID userId, String username,
+            String password, String name, String email, String contactinfo, UserStatus status) {
         super(userId, username, password, name, email, contactinfo, Role.AGENT, status);
         this.agentID = agentID;
         this.department = department;
         this.commision = commision;
     }
 
-    public Agent(String username, String password, String name, String email, String contactinfo, 
-    String department, double commision) {
+    public Agent(String username, String password, String name, String email, String contactinfo,
+            String department, double commision) {
         super(username, password, name, email, contactinfo, Role.AGENT);
         this.agentID = UUID.randomUUID();
         this.department = department;
@@ -51,80 +54,67 @@ public class Agent extends User {
 
     @Override
     public void showMenu() {
-        System.out.println("---- Agent Menu ----");
-        System.out.println("1. Manage Flights");
-        System.out.println("2. Create Booking for Customer");
-        System.out.println("3. Modify Booking");
-        System.out.println("4. Generate Reports");
-        System.out.println("5. Update Profile");
-        System.out.println("6. Logout");
-        // Scanner scanner = new Scanner(System.in);
-        // int choice = scanner.nextInt();
-        // scanner.nextLine();
-        // switch (choice) {
-        //     case 1:
-        //         manageFlights();
-        //         break;
-        //     case 2:
-        //         System.out.println("Creating Booking for Customer...");
-        //         createBooking();
-        //         break;
-        //     case 3:
-        //         // Call a method to modify booking (to be implemented)
-        //         System.out.println("Modifying Booking...");
-        //         break;
-        //     case 4:
-        //         generateReports();
-        //         break;
-        //     case 5:
-        //         updateprofile(username, password, name, email, contactinfo);
-        //         break;
-        //     case 6:
-        //         logout();
-        //         break;
-        //     default:
-        //         System.out.println("Invalid option. Try again.");
-        //         showMenu();
-        //         break;
-        // }
+        List<String> mainMenu = new ArrayList<>() {
+            {
+                add("Manage Flights");
+                add("Create Booking for Customer");
+                add("Modify Booking");
+                add("Generate Reports");
+            }
+        };
+        int choice = Console.displayMenu("Agent Menu", mainMenu);
+        
+        switch (choice) {
+            case 1:
+                this.manageFlights();
+                break;
+        
+            default:
+                break;
+        }
     }
 
     public void manageFlights() {
-        System.out.println("Managing flights...");
-        System.out.println("---- Manage Flights ----");
-        System.out.println("1. Add New Flight"); // add new flight directly to the file and Booking system class
-        System.out.println("2. Edit Existing Flight"); // search for the flight then pass the parameters after validation
-        System.out.println("3. Remove Flight"); // external with exception if there's any booking
-        System.out.println("4. View All Flights"); // external
-        System.out.println("5. Back to Menu");
-        // Scanner scanner = new Scanner(System.in);
-        // int choice = scanner.nextInt();
-        // scanner.nextLine();
+        List<String> flightManagementMenu = new ArrayList<>() {{
+            add("Add New Flight");
+            add("Edit Existing Flight");
+            add("Remove Flight");
+            add("View All Flights");
+            add("Back to Menu");
+        }};
+        int choice = Console.displayMenu("Manage Flights", flightManagementMenu);
 
-        // switch (choice) {
-        //     case 1:
-        //         addNewFlight();
-        //         break;
-        //     case 2:
-        //         editFlight();
-        //         break;
-        //     case 3:
-        //         removeFlight();
-        //         break;
-        //     case 4:
-        //         viewFlights();
-        //         break;
-        //     case 5:
-        //         showMenu();  // العودة إلى القائمة الرئيسية
-        //         break;
-        //     default:
-        //         System.out.println("Invalid option. Try again.");
-        //         manageFlights();
-        //         break;
-        // }
+        switch (choice) {
+            case 1:
+                this.createFlight();
+                break;
+            case 2:
+            try {
+                this.editFlight();;
+            } catch(Exception e) {
+                System.out.println(e.getMessage());
+            }
+                break;
+            case 3:
+                try {
+                    this.removeFlight();
+                } catch(Exception e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
+            case 4:
+                this.viewFlights();
+                break;
+            case 5:
+                this.showMenu();
+                break;
+            default:
+                break;
+        }
     }
 
-    public void CreateFlight() {
+    // TODO refactor
+    public void createFlight() {
         Scanner scanner = new Scanner(System.in);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -190,164 +180,155 @@ public class Agent extends User {
         System.out.printf("%-18s: %s%n", "Destination", destination);
         System.out.printf("%-18s: %s%n", "Departure", departureTime.format(formatter));
         System.out.printf("%-18s: %s%n", "Arrival", arrivalTime.format(formatter));
-        System.out.printf("%-18s: %d available, %d booked, $%.2f each%n", "Economy Seats", availableEconomySeats, bookedEconomySeats, economyPrice);
-        System.out.printf("%-18s: %d available, %d booked, $%.2f each%n", "Business Seats", availableBusinessSeats, bookedBusinessSeats, businessPrice);
-        System.out.printf("%-18s: %d available, %d booked, $%.2f each%n", "First Class Seats", availableFirstClassSeats, bookedFirstClassSeats, firstClassPrice);
+        System.out.printf("%-18s: %d available, %d booked, $%.2f each%n", "Economy Seats", availableEconomySeats,
+                bookedEconomySeats, economyPrice);
+        System.out.printf("%-18s: %d available, %d booked, $%.2f each%n", "Business Seats", availableBusinessSeats,
+                bookedBusinessSeats, businessPrice);
+        System.out.printf("%-18s: %d available, %d booked, $%.2f each%n", "First Class Seats", availableFirstClassSeats,
+                bookedFirstClassSeats, firstClassPrice);
 
         Flight flight = new Flight(airline, origin, destination, departureTime, arrivalTime,
-        availableEconomySeats, bookedEconomySeats, economyPrice, 
-        availableBusinessSeats, bookedBusinessSeats, businessPrice,
-        availableFirstClassSeats, bookedFirstClassSeats,  firstClassPrice);
+                availableEconomySeats, bookedEconomySeats, economyPrice,
+                availableBusinessSeats, bookedBusinessSeats, businessPrice,
+                availableFirstClassSeats, bookedFirstClassSeats, firstClassPrice);
 
         BookingSystem.getInstance().saveFlight(flight);
     }
 
-    // search for the customer (assuming existance)
-    // public Booking createBookingForCustomer(Customer customer, Flight flight) {
-    //     Scanner scanner = new Scanner(System.in);
+    public void editFlight() throws OperationsException{
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter flight number to edit: ");
+        String flightNumber = scanner.nextLine();
 
-    //     System.out.print("Enter customer name: ");
-    //     String customerName = scanner.nextLine();
+        Flight flight = BookingSystem.getInstance().getFlightByNumber(flightNumber);
+        if (flight == null) {
+            System.out.println("No flight found with this flight number.");
+            this.showMenu();
+        }
 
-    //     System.out.print("Enter flight number: ");
-    //     String flightNumber = scanner.nextLine();
+        System.out.println("=== Update Flight Details ===");
 
-    //     Flight selectedFlight = findFlight(flightNumber);
-    //     if (selectedFlight == null) {
-    //         System.out.println("❌ Flight not found.");
-    //         return;
-    //     }
+        // Departure Time
+        LocalDateTime newDepTime = null;
+        while (newDepTime == null) {
+            String newDepTimeStr = scanner.nextLine();
+            System.out.print("Enter new departure time (yyyy-MM-dd HH:mm) (current: " + flight.getDepartureTime() + "): ");
+            try {
+                newDepTime = LocalDateTime.parse(newDepTimeStr,
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                flight.setDepartureTime(newDepTime);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format");
+            }
+        }
 
-    //     System.out.println("Choose seat class (economy/business/first): ");
-    //     String seatClass = scanner.nextLine().trim().toLowerCase();
+        // Arrival Time
+        LocalDateTime newArrTime = null;
+        while (newArrTime == null) {
+            String newArrTimeStr = scanner.nextLine();
+            System.out.print("Enter new arrival time (yyyy-MM-dd HH:mm) (current: " + flight.getArrivalTime() + "): ");
+            try {
+                newArrTime = LocalDateTime.parse(newArrTimeStr,
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                flight.setArrivalTime(newArrTime);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format");
+            }
+        }
 
-    //     boolean success = false;
+        // Economy class
+        System.out.println("Enter economy class updated information");
+        Double eprice = null;
+        while (eprice == null) {
+            try {
+                System.out.println("Enter new Economy seats price (current: " + flight.getEconomyFilghtSeatsPrice());
+                eprice = scanner.nextDouble();
+            } catch (Exception e) {
+                System.out.println("Please enter a valid price format");
+            } 
+        }
 
-    //     // التحقق من نوع المقعد الذي اختاره العميل
-    //     switch (seatClass.toLowerCase()) {
-    //         case "economy":
-    //             if (selectedFlight.getAvailableEconomySeats() > 0) {
-    //                 selectedFlight.setAvailableEconomySeats(selectedFlight.getAvailableEconomySeats() - 1); // تحديث المقاعد
-    //                 selectedFlight.setAvailableBusinessSeats(selectedFlight.getAvailableEconomySeats() + 1);
-    //                 success = true;
-    //             } else {
-    //                 System.out.println("Unavailable seats in economic class");
-    //             }
-    //             break;
+        System.out.println("Enter economy class updated seats availability");
+        Integer eavailability = null;
+        while (eavailability == null) {
+            try {
+                System.out.println("Enter new Economy seats availability (current: " + flight.getEconomyFilghtSeatsAvailability());
+                eavailability = scanner.nextInt();
+            } catch (Exception e) {
+                System.out.println("Please enter a valid number");
+            } 
+        }
 
-    //         case "business":
-    //             if (selectedFlight.getAvailableBusinessSeats() > 0) {
-    //                 selectedFlight.setAvailableBusinessSeats(selectedFlight.getAvailableBusinessSeats() - 1); // تحديث المقاعد
-    //                 selectedFlight.setAvailableBusinessSeats(selectedFlight.getBookedBusinessSeats() + 1);
-    //                 success = true;
-    //             } else {
-    //                 System.out.println("There is no available seats in business class ");
-    //             }
-    //             break;
+        // Business class
+        System.out.println("Enter Business class updated information");
+        Double bprice = null;
+        while (bprice == null) {
+            try {
+                System.out.println("Enter new Business seats price (current: " + flight.getBusinessFlightSeatsPrice());
+                bprice = scanner.nextDouble();
+            } catch (Exception e) {
+                System.out.println("Please enter a valid price format");
+            } 
+        }
 
-    //         case "first":
-    //             if (selectedFlight.getAvailableFirstClassSeats() > 0) {
-    //                 selectedFlight.setAvailableFirstClassSeats(selectedFlight.getAvailableFirstClassSeats() - 1); // تحديث المقاعد
-    //                 selectedFlight.setAvailableBusinessSeats(selectedFlight.getAvailableFirstClassSeats() + 1);
-    //                 success = true;
-    //             } else {
-    //                 System.out.println("Unavailable seats in First Class");
-    //             }
-    //             break;
+        System.out.println("Enter Business class updated seats availability");
+        Integer bavailability = null;
+        while (bavailability == null) {
+            try {
+                System.out.println("Enter new Business seats availability (current: " + flight.getBusinessFlightSeatsAvailability());
+                bavailability = scanner.nextInt();
+            } catch (Exception e) {
+                System.out.println("Please enter a valid number");
+            } 
+        }
 
-    //         default:
-    //             System.out.println("❌ Invalid seat class.");
-    //             return;
-    //     }
+        // FirstClass class
+        System.out.println("Enter FirstClass class updated information");
+        Double fprice = null;
+        while (fprice == null) {
+            try {
+                System.out.println("Enter new FirstClass seats price (current: " + flight.getFirstClassFilghtSeatsPrice());
+                fprice = scanner.nextDouble();
+            } catch (Exception e) {
+                System.out.println("Please enter a valid price format");
+            } 
+        }
 
-    //     if (success) {
-    //         System.out.println("✅ Booking successful for " + customerName + " on flight " + flightNumber +".");
-    //     }
-    // }
+        System.out.println("Enter FirstClass class updated seats availability");
+        Integer favailability = null;
+        while (favailability == null) {
+            try {
+                System.out.println("Enter new FirstClass seats availability (current: " + flight.getFirstClassFilghtSeatsAvailability());
+                favailability = scanner.nextInt();
+            } catch (Exception e) {
+                System.out.println("Please enter a valid number");
+            } 
+        }
+        scanner.close();
+        flight.update(newDepTime, newArrTime, eprice, eavailability, bprice, bavailability, fprice, favailability);
+        BookingSystem.getInstance().updateFlight();
+    }
 
+    public void removeFlight() throws OperationsException {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter flight number to edit: ");
+        String flightNumber = scanner.nextLine();
 
+        Flight flight = BookingSystem.getInstance().getFlightByNumber(flightNumber);
+        if (flight == null) {
+            System.out.println("No flight found with this flight number.");
+            scanner.close();
+            this.showMenu();
+        }
+        scanner.close();
+        BookingSystem.getInstance().removeFlight(flightNumber);
+    }
 
+    public void viewFlights() {
+        BookingSystem.getInstance().printFlights();
+    }
 
-
-    // public void modifyBooking(Booking booking, String name, ) {
-    //     Scanner scanner = new Scanner(System.in);
-
-    //     System.out.print("Enter customer name: ");
-    //     String customerName = scanner.nextLine();
-
-    //     System.out.print("Enter flight number: ");
-    //     String flightNumber = scanner.nextLine();
-
-    //     Flight flight = findFlight(flightNumber);
-    //     if (flight == null) {
-    //         System.out.println("❌ Flight not found.");
-    //         return;
-    //     }
-
-    //     System.out.println("Do you want to change the date/time? (yes/no)");
-    //     String changeTime = scanner.nextLine().trim().toLowerCase();
-    //     if (changeTime.equals("yes")) {
-    //         try {
-    //             System.out.print("Enter new departure time (yyyy-MM-dd HH:mm): ");
-    //             String dep = scanner.nextLine();
-    //             System.out.print("Enter new arrival time (yyyy-MM-dd HH:mm): ");
-    //             String arr = scanner.nextLine();
-
-    //             flight.setDepartureTime(LocalDateTime.parse(dep));
-    //             flight.setArrivalTime(LocalDateTime.parse(arr));
-    //             System.out.println("✅ Schedule updated.");
-    //         } catch (Exception e) {
-    //             System.out.println("❌ Invalid date format.");
-    //             return;
-    //         }
-    //     }
-
-    //     System.out.println("Do you want to change seat class? (yes/no)");
-    //     String changeClass = scanner.nextLine().trim().toLowerCase();
-    //     if (changeClass.equals("yes")) {
-    //         System.out.print("Enter your current seat class (economy/business/first): ");
-    //         String oldClass = scanner.nextLine().trim().toLowerCase();
-
-    //         System.out.print("Enter new seat class (economy/business/first): ");
-    //         String newClass = scanner.nextLine().trim().toLowerCase();
-
-    //         // تحقق من توفر مقعد في الكلاس الجديد
-    //         boolean canChange = false;
-
-    //         if (newClass.equals("economy") && flight.getAvailableEconomySeats() > 0) {
-    //             flight.setAvailableEconomySeats(flight.getAvailableEconomySeats() - 1);
-    //             canChange = true;
-    //         } else if (newClass.equals("business") && flight.getAvailableBusinessSeats() > 0) {
-    //             flight.setAvailableBusinessSeats(flight.getAvailableBusinessSeats() - 1);
-    //             canChange = true;
-    //         } else if (newClass.equals("first") && flight.getAvailableFirstClassSeats() > 0) {
-    //             flight.setAvailableFirstClassSeats(flight.getAvailableFirstClassSeats() - 1);
-    //             canChange = true;
-    //         }
-
-    //         if (canChange) {
-    //             // استرجاع المقعد من الكلاس القديم
-    //             if (oldClass.equals("economy")) {
-    //                 flight.setAvailableEconomySeats(flight.getAvailableEconomySeats() + 1);
-    //             } else if (oldClass.equals("business")) {
-    //                 flight.setAvailableBusinessSeats(flight.getAvailableBusinessSeats() + 1);
-    //             } else if (oldClass.equals("first")) {
-    //                 flight.setAvailableFirstClassSeats(flight.getAvailableFirstClassSeats() + 1);
-    //             }
-
-    //             System.out.println("✅ Seat class changed successfully.");
-    //         } else {
-    //             System.out.println("❌ No available seats in new class.");
-    //         }
-    //     } else {
-    //         System.out.println("⏳ Keeping the same seat class.");
-    //     }
-
-    //     // تحديث الرحلة في الملف (لو عندك الدالة دي)
-    //     // updateFlightInFile(flight);
-    // }
-
-    public void generateReports () {
+    public void generateReports() {
         System.out.println("---- Generate Report Menu ----");
         System.out.println("1. View All Flights");
         System.out.println("2. View Booked Seats");
@@ -355,96 +336,8 @@ public class Agent extends User {
         System.out.println("4. Back to Main Menu");
     }
 
-Scanner scanner = new Scanner(System.in);
-    public void editFlight() {
-    System.out.print("Enter flight number to edit: ");
-    String flightNumber = scanner.nextLine();
-
-    // Flight flight = findFlightByNumber(flightNumber);
-    Flight flight = null;
-    if (flight == null) {
-        System.out.println("No flight found with this flight number.");
-        return;
-    }
-
-    System.out.println("Current flight information:");
-    System.out.println(flight);
-System.out.println("=== Update Flight Details ===");
-
-    // Airline
-    System.out.print("Enter new airline (current: " + flight.getAirline() + "): ");
-    String newAirline = scanner.nextLine();
-    if (!newAirline.isEmpty()) flight.setAirline(newAirline);
-
-    // Origin
-    System.out.print("Enter new origin (current: " + flight.getOrigin() + "): ");
-    String newOrigin = scanner.nextLine();
-    if (!newOrigin.isEmpty()) flight.setOrigin(newOrigin);
-
-    // Destination
-    System.out.print("Enter new destination (current: " + flight.getDestination() + "): ");
-    String newDestination = scanner.nextLine();
-    if (!newDestination.isEmpty()) flight.setDestination(newDestination);
-
-    // Departure Time
-    System.out.print("Enter new departure time (yyyy-MM-dd HH:mm) (current: " + flight.getDepartureTime() + "): ");
-    String newDepTimeStr = scanner.nextLine();
-    if (!newDepTimeStr.isEmpty()) {
-        try {
-            LocalDateTime newDepTime = LocalDateTime.parse(newDepTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-            flight.setDepartureTime(newDepTime);
-        } catch (DateTimeParseException e) {
-            System.out.println("Invalid date format. Skipping update for departure time.");
-        }
-    }
-
-    // Arrival Time
-    System.out.print("Enter new arrival time (yyyy-MM-dd HH:mm) (current: " + flight.getArrivalTime() + "): ");
-    String newArrTimeStr = scanner.nextLine();
-    if (!newArrTimeStr.isEmpty()) {
-        try {
-            LocalDateTime newArrTime = LocalDateTime.parse(newArrTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-            flight.setArrivalTime(newArrTime);
-        } catch (DateTimeParseException e) {
-            System.out.println("Invalid date format. Skipping update for arrival time.");
-        }
-    }
-
-    // // Base Prices (if needed)
-    // for (SeatClass seatClass : SeatClass.values()) {
-    //     double currentPrice = FlightSeat.ge(seatClass);
-    //     System.out.print("Enter new base price for " + seatClass + " (current: $" + currentPrice + "): ");
-    //     String priceInput = scanner.nextLine();
-    //     if (!priceInput.isEmpty()) {
-    //         try {
-    //             double newPrice = Double.parseDouble(priceInput);
-    //             flight.setBasePrice(seatClass, newPrice);
-    //         } catch (NumberFormatException e) {
-    //             System.out.println("Invalid number. Skipping update for " + seatClass + " price.");
-    //         }
-    //     }
-    // }
-
-    System.out.println("Flight updated successfully.");
-
-    // Save changes
-    FileManager.saveFlight(flight);
-
-    // Update bookings
-   List<Booking> bookings = FileManager.loadBookings();  // You must implement this if not available
-
-for (Booking booking : bookings) {
-    if (booking.getFlightNumber().equalsIgnoreCase(flightNumber)) {
-        booking.setFlight(flight);
-    }
-}
-FileManager.saveBookingBatch(bookings, true);
-    }
-
-
     @Override
-    public String toString(){
+    public String toString() {
         return agentID + "," + department + "," + commision + "," + super.toString();
     }
 }
-

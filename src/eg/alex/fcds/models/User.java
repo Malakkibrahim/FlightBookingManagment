@@ -108,6 +108,11 @@ public abstract class User {
         this.status = UserStatus.INACTIVE;
     }
 
+    public boolean validatePassword(String password) 
+    {
+        return this.password.contentEquals(Utils.hashPassword(password));
+    }
+
     private void setPassword(String password) {
         if(!Utils.isValidPassword(password))
             throw new IllegalArgumentException(password);

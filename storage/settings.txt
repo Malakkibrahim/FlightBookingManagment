@@ -1,0 +1,4 @@
+#App Settings
+#Wed May 14 00:25:31 AST 2025
+color=red
+lang=ar
