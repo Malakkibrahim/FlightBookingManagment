@@ -1,4 +1,6 @@
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import shared.*;
@@ -13,6 +15,9 @@ public class Flight {
     private FlightSeat economyFilghtSeats;
     private FlightSeat businessFlightSeats;
     private FlightSeat firstClassFilghtSeats;
+    List<Flight> flights = new ArrayList<>();
+List<Booking> bookings = new ArrayList<>();
+
 
     public Flight(String airline, String origin, String destination, 
     LocalDateTime departureTime, LocalDateTime arrivalTime,
@@ -140,6 +145,17 @@ public class Flight {
                 return false;
         }
     }
+
+   public Flight findFlightByNumber(String flightNumber) {
+    for (Flight flight : flights) {
+        if (flight.getFlightNumber().equalsIgnoreCase(flightNumber)) {
+            return flight;
+        }
+    }
+    return null;
+}
+
+
 
     public void reserveSeat(SeatClass seatClass) {
         this.reserveSeats(seatClass,1);

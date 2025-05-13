@@ -18,6 +18,10 @@ public class BookingSystem {
     private Scanner scanner = new Scanner(System.in);
 
     private static BookingSystem instance;
+    public List<Administrator> getAdmins() { return this.admins; }
+public List<Agent> getAgents() { return this.agents; }
+public List<Customer> getCustomers() { return this.customers; }
+
 
     private BookingSystem() {
         admins = FileManager.loadAdmins();

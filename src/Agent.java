@@ -351,6 +351,92 @@ public class Agent extends User {
         System.out.println("4. Back to Main Menu");
     }
 
+Scanner scanner = new Scanner(System.in);
+    public void editFlight() {
+    System.out.print("Enter flight number to edit: ");
+    String flightNumber = scanner.nextLine();
+
+    Flight flight = findFlightByNumber(flightNumber);
+    if (flight == null) {
+        System.out.println("No flight found with this flight number.");
+        return;
+    }
+
+    System.out.println("Current flight information:");
+    System.out.println(flight);
+System.out.println("=== Update Flight Details ===");
+
+    // Airline
+    System.out.print("Enter new airline (current: " + flight.getAirline() + "): ");
+    String newAirline = scanner.nextLine();
+    if (!newAirline.isEmpty()) flight.setAirline(newAirline);
+
+    // Origin
+    System.out.print("Enter new origin (current: " + flight.getOrigin() + "): ");
+    String newOrigin = scanner.nextLine();
+    if (!newOrigin.isEmpty()) flight.setOrigin(newOrigin);
+
+    // Destination
+    System.out.print("Enter new destination (current: " + flight.getDestination() + "): ");
+    String newDestination = scanner.nextLine();
+    if (!newDestination.isEmpty()) flight.setDestination(newDestination);
+
+    // Departure Time
+    System.out.print("Enter new departure time (yyyy-MM-dd HH:mm) (current: " + flight.getDepartureTime() + "): ");
+    String newDepTimeStr = scanner.nextLine();
+    if (!newDepTimeStr.isEmpty()) {
+        try {
+            LocalDateTime newDepTime = LocalDateTime.parse(newDepTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            flight.setDepartureTime(newDepTime);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date format. Skipping update for departure time.");
+        }
+    }
+
+    // Arrival Time
+    System.out.print("Enter new arrival time (yyyy-MM-dd HH:mm) (current: " + flight.getArrivalTime() + "): ");
+    String newArrTimeStr = scanner.nextLine();
+    if (!newArrTimeStr.isEmpty()) {
+        try {
+            LocalDateTime newArrTime = LocalDateTime.parse(newArrTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            flight.setArrivalTime(newArrTime);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date format. Skipping update for arrival time.");
+        }
+    }
+
+    // // Base Prices (if needed)
+    // for (SeatClass seatClass : SeatClass.values()) {
+    //     double currentPrice = FlightSeat.ge(seatClass);
+    //     System.out.print("Enter new base price for " + seatClass + " (current: $" + currentPrice + "): ");
+    //     String priceInput = scanner.nextLine();
+    //     if (!priceInput.isEmpty()) {
+    //         try {
+    //             double newPrice = Double.parseDouble(priceInput);
+    //             flight.setBasePrice(seatClass, newPrice);
+    //         } catch (NumberFormatException e) {
+    //             System.out.println("Invalid number. Skipping update for " + seatClass + " price.");
+    //         }
+    //     }
+    // }
+
+    System.out.println("Flight updated successfully.");
+
+    // Save changes
+    FileManager.saveFlight(flight);
+
+    // Update bookings
+   List<Booking> bookings = FileManager.loadBookings();  // You must implement this if not available
+
+for (Booking booking : bookings) {
+    if (booking.getFlightNumber().equalsIgnoreCase(flightNumber)) {
+        booking.setFlight(flight);
+    }
+}
+FileManager.saveBookingBatch(bookings, true);
+    }
+
+
     @Override
     public String toString(){
         return agentID + "," + department + "," + commision + "," + super.toString();

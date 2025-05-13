@@ -17,6 +17,9 @@ public class FlightSeat {
   public SeatClass getSeatClass() {
     return seatClass;
   }
+  public void setBasePrice(double price){
+    this.price = price;
+  }
 
   public double getPrice() {
     return price;
