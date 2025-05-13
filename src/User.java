@@ -60,34 +60,34 @@ public abstract class User {
 
     public abstract void showMenu();
 
-    public boolean LOGIN(String password, String userName) {
-        if (this.password.equals(password) && this.username.equals(userName)) {
-            System.out.println("You login Successfully ✅");
+    // public boolean LOGIN(String userName, String password) {
+    //     if (this.password.equals(password) && this.username.equals(userName)) {
+    //         System.out.println("You login Successfully ✅");
 
-            showMenu();
-            return true;
-        } else {
-            System.out.println("❌ Incorrect username or password");
-            return false;
-        }
-    }
+    //         showMenu();
+    //         return true;
+    //     } else {
+    //         System.out.println("❌ Incorrect username or password");
+    //         return false;
+    //     }
+    // }
 
     public void logout() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Are you sure that you want to logout? (yes/no): ");
-        String answer = scanner.nextLine().trim().toLowerCase(); // نحول الإجابة لحروف صغيرة ونحذف المسافات
+        String answer = scanner.nextLine().trim().toLowerCase(); 
 
         if (answer.equals("yes") || answer.equals("y")) {
             System.out.println("👋 Logged out successfully.");
-            // هنا تقدر تضيف كود الخروج من البرنامج أو الرجوع للقائمة الرئيسية
-            System.exit(0); // لو عايز تقفل البرنامج تمامًا
+            System.exit(0); 
         } else if (answer.equals("no") || answer.equals("n")) {
             System.out.println("🔁 Logout cancelled. Returning to menu...");
-            showMenu(); // يرجعه للمينيو تاني
+            showMenu(); 
         } else {
             System.out.println("❌ Invalid input. Please type 'yes' or 'no'.");
-            logout(); // تعيد السؤال لو الإجابة مش مفهومة
+            logout();
         }
+        scanner.close();
     }
 
     public void updateprofile(String username, String password, String name, String email, String contactinfo) {
@@ -122,7 +122,7 @@ public abstract class User {
     public String toString()
     {
         return userId + "," + username + "," + password + "," +
-        name + "," + email + "," + contactinfo + "," + role + "," + status;
+        name + "," + email + "," + contactinfo  + "," + status;
     }
 }
 

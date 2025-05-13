@@ -1,11 +1,11 @@
 import java.util.*;
 
 import payment.*;
+import shared.Utils;
 import shared.PaymentMethod;
 import shared.PaymentStatus;
-
-import java.io.*;
 import java.time.LocalDateTime;
+
 public class BookingSystem {
     private List<Administrator> admins;
     private List<Agent> agents;
@@ -15,45 +15,80 @@ public class BookingSystem {
     private List<Payment> payments;
     private List<Passenger> passengers;
     private List<SeatSelection> seats;
+    private Scanner scanner = new Scanner(System.in);
 
     public BookingSystem() {
         admins = FileManager.loadAdmins();
         agents = FileManager.loadAgents();
         customers = FileManager.loadCustomers();
-        flights = FileManager.loadFlights();
-        bookings = FileManager.loadBookings();
-        payments = FileManager.loadPayments();
-        passengers = FileManager.loadPassengers();
-        seats = FileManager.loadSeatSelections();
+        // flights = FileManager.loadFlights();
+        // bookings = FileManager.loadBookings();
+        // payments = FileManager.loadPayments();
+        // passengers = FileManager.loadPassengers();
+        // seats = FileManager.loadSeatSelections();
 
-        for(Booking booking : bookings) {
-            for(Customer customer : customers) {
-                if(booking.getCustomerId() == customer.getCustomerId()) {
-                    customer.addBooking(booking);
-                    booking.setCustomer(customer);
-                }
-            }
+        // for(Booking booking : bookings) {
+        //     for(Customer customer : customers) {
+        //         if(booking.getCustomerId() == customer.getCustomerId()) {
+        //             customer.addBooking(booking);
+        //             booking.setCustomer(customer);
+        //         }
+        //     }
 
-            for(Flight flight : flights)
-            {
-                if(booking.getFlightNumber().equalsIgnoreCase(flight.getFlightNumber())) {
-                    booking.setFlight(flight);
-                }
-            }
+        //     for(Flight flight : flights)
+        //     {
+        //         if(booking.getFlightNumber().equalsIgnoreCase(flight.getFlightNumber())) {
+        //             booking.setFlight(flight);
+        //         }
+        //     }
 
-            for(Passenger passenger : passengers) {
-                if(booking.getBookingReferenceNumber().equalsIgnoreCase(passenger.getBookingReferenceNumber())) {
-                    booking.addPassenger(passenger);
-                }
+        //     for(Passenger passenger : passengers) {
+        //         if(booking.getBookingReferenceNumber().equalsIgnoreCase(passenger.getBookingReferenceNumber())) {
+        //             booking.addPassenger(passenger);
+        //         }
 
-                for(SeatSelection seat : seats) {
-                    if(seat.getBookingReferanceNumber().equalsIgnoreCase(booking.getBookingReferenceNumber()) && 
-                    seat.getPassengerId().equals(passenger.getPassengerId())) {
-                        booking.addSeatSelection(seat);
-                    }
-                }
+        //         for(SeatSelection seat : seats) {
+        //             if(seat.getBookingReferanceNumber().equalsIgnoreCase(booking.getBookingReferenceNumber()) && 
+        //             seat.getPassengerId().equals(passenger.getPassengerId())) {
+        //                 booking.addSeatSelection(seat);
+        //             }
+        //         }
+        //     }
+        // }
+        Login();
+    }
+
+    public void Login() {
+        System.out.println("=== User Login ===");
+        System.out.print("Please enter your username: ");
+        String username = scanner.nextLine();
+
+        System.out.print("Please enter your password: ");
+        String password = Utils.hashPassword(scanner.nextLine());
+        
+        User user = null;
+        for(Administrator admin : admins) {
+            if(admin.username.equals(username) && admin.password.equals(password))
+                user = admin;
+        }
+        
+        if(user == null) {
+            for(Agent agent : agents) {
+                if(agent.username.equals(username) && agent.password.equals(password))
+                    user = agent;
             }
         }
+
+        if(user == null) {
+            for(Customer customer : customers) {
+                if(customer.username.equals(username) && customer.password.equals(password))
+                    user = customer;
+            }
+        }
+
+        if(user == null)
+            throw new SecurityException("You Entered Invalid Credentials, please check and try again!");
+        user.showMenu();
     }
 
     public List<Flight> searchFlights(String origin, String destination, LocalDateTime date) {
@@ -141,7 +176,6 @@ public class BookingSystem {
 
         scanner.close();
     }
-
 
     public void generateTicket(Booking booking, Payment payment) {
         

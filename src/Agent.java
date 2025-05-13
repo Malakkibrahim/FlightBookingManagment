@@ -1,8 +1,3 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.time.LocalDateTime;
 import java.util.*;
 import shared.*;
 
@@ -122,147 +117,153 @@ public class Agent extends User {
         // }
     }
 
+
+
+
     // search for the customer (assuming existance)
-    // 
-    public Booking createBookingForCustomer(Customer customer, Flight flight) {
-        Scanner scanner = new Scanner(System.in);
+    // public Booking createBookingForCustomer(Customer customer, Flight flight) {
+    //     Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Enter customer name: ");
-        String customerName = scanner.nextLine();
+    //     System.out.print("Enter customer name: ");
+    //     String customerName = scanner.nextLine();
 
-        System.out.print("Enter flight number: ");
-        String flightNumber = scanner.nextLine();
+    //     System.out.print("Enter flight number: ");
+    //     String flightNumber = scanner.nextLine();
 
-        Flight selectedFlight = findFlight(flightNumber);
-        if (selectedFlight == null) {
-            System.out.println("❌ Flight not found.");
-            return;
-        }
+    //     Flight selectedFlight = findFlight(flightNumber);
+    //     if (selectedFlight == null) {
+    //         System.out.println("❌ Flight not found.");
+    //         return;
+    //     }
 
-        System.out.println("Choose seat class (economy/business/first): ");
-        String seatClass = scanner.nextLine().trim().toLowerCase();
+    //     System.out.println("Choose seat class (economy/business/first): ");
+    //     String seatClass = scanner.nextLine().trim().toLowerCase();
 
-        boolean success = false;
+    //     boolean success = false;
 
-        // التحقق من نوع المقعد الذي اختاره العميل
-        switch (seatClass.toLowerCase()) {
-            case "economy":
-                if (selectedFlight.getAvailableEconomySeats() > 0) {
-                    selectedFlight.setAvailableEconomySeats(selectedFlight.getAvailableEconomySeats() - 1); // تحديث المقاعد
-                    selectedFlight.setAvailableBusinessSeats(selectedFlight.getAvailableEconomySeats() + 1);
-                    success = true;
-                } else {
-                    System.out.println("Unavailable seats in economic class");
-                }
-                break;
+    //     // التحقق من نوع المقعد الذي اختاره العميل
+    //     switch (seatClass.toLowerCase()) {
+    //         case "economy":
+    //             if (selectedFlight.getAvailableEconomySeats() > 0) {
+    //                 selectedFlight.setAvailableEconomySeats(selectedFlight.getAvailableEconomySeats() - 1); // تحديث المقاعد
+    //                 selectedFlight.setAvailableBusinessSeats(selectedFlight.getAvailableEconomySeats() + 1);
+    //                 success = true;
+    //             } else {
+    //                 System.out.println("Unavailable seats in economic class");
+    //             }
+    //             break;
 
-            case "business":
-                if (selectedFlight.getAvailableBusinessSeats() > 0) {
-                    selectedFlight.setAvailableBusinessSeats(selectedFlight.getAvailableBusinessSeats() - 1); // تحديث المقاعد
-                    selectedFlight.setAvailableBusinessSeats(selectedFlight.getBookedBusinessSeats() + 1);
-                    success = true;
-                } else {
-                    System.out.println("There is no available seats in business class ");
-                }
-                break;
+    //         case "business":
+    //             if (selectedFlight.getAvailableBusinessSeats() > 0) {
+    //                 selectedFlight.setAvailableBusinessSeats(selectedFlight.getAvailableBusinessSeats() - 1); // تحديث المقاعد
+    //                 selectedFlight.setAvailableBusinessSeats(selectedFlight.getBookedBusinessSeats() + 1);
+    //                 success = true;
+    //             } else {
+    //                 System.out.println("There is no available seats in business class ");
+    //             }
+    //             break;
 
-            case "first":
-                if (selectedFlight.getAvailableFirstClassSeats() > 0) {
-                    selectedFlight.setAvailableFirstClassSeats(selectedFlight.getAvailableFirstClassSeats() - 1); // تحديث المقاعد
-                    selectedFlight.setAvailableBusinessSeats(selectedFlight.getAvailableFirstClassSeats() + 1);
-                    success = true;
-                } else {
-                    System.out.println("Unavailable seats in First Class");
-                }
-                break;
+    //         case "first":
+    //             if (selectedFlight.getAvailableFirstClassSeats() > 0) {
+    //                 selectedFlight.setAvailableFirstClassSeats(selectedFlight.getAvailableFirstClassSeats() - 1); // تحديث المقاعد
+    //                 selectedFlight.setAvailableBusinessSeats(selectedFlight.getAvailableFirstClassSeats() + 1);
+    //                 success = true;
+    //             } else {
+    //                 System.out.println("Unavailable seats in First Class");
+    //             }
+    //             break;
 
-            default:
-                System.out.println("❌ Invalid seat class.");
-                return;
-        }
+    //         default:
+    //             System.out.println("❌ Invalid seat class.");
+    //             return;
+    //     }
 
-        if (success) {
-            System.out.println("✅ Booking successful for " + customerName + " on flight " + flightNumber +".");
-        }
-    }
+    //     if (success) {
+    //         System.out.println("✅ Booking successful for " + customerName + " on flight " + flightNumber +".");
+    //     }
+    // }
 
-    public void modifyBooking(Booking booking, String name, ) {
-        Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Enter customer name: ");
-        String customerName = scanner.nextLine();
 
-        System.out.print("Enter flight number: ");
-        String flightNumber = scanner.nextLine();
 
-        Flight flight = findFlight(flightNumber);
-        if (flight == null) {
-            System.out.println("❌ Flight not found.");
-            return;
-        }
 
-        System.out.println("Do you want to change the date/time? (yes/no)");
-        String changeTime = scanner.nextLine().trim().toLowerCase();
-        if (changeTime.equals("yes")) {
-            try {
-                System.out.print("Enter new departure time (yyyy-MM-dd HH:mm): ");
-                String dep = scanner.nextLine();
-                System.out.print("Enter new arrival time (yyyy-MM-dd HH:mm): ");
-                String arr = scanner.nextLine();
+    // public void modifyBooking(Booking booking, String name, ) {
+    //     Scanner scanner = new Scanner(System.in);
 
-                flight.setDepartureTime(LocalDateTime.parse(dep));
-                flight.setArrivalTime(LocalDateTime.parse(arr));
-                System.out.println("✅ Schedule updated.");
-            } catch (Exception e) {
-                System.out.println("❌ Invalid date format.");
-                return;
-            }
-        }
+    //     System.out.print("Enter customer name: ");
+    //     String customerName = scanner.nextLine();
 
-        System.out.println("Do you want to change seat class? (yes/no)");
-        String changeClass = scanner.nextLine().trim().toLowerCase();
-        if (changeClass.equals("yes")) {
-            System.out.print("Enter your current seat class (economy/business/first): ");
-            String oldClass = scanner.nextLine().trim().toLowerCase();
+    //     System.out.print("Enter flight number: ");
+    //     String flightNumber = scanner.nextLine();
 
-            System.out.print("Enter new seat class (economy/business/first): ");
-            String newClass = scanner.nextLine().trim().toLowerCase();
+    //     Flight flight = findFlight(flightNumber);
+    //     if (flight == null) {
+    //         System.out.println("❌ Flight not found.");
+    //         return;
+    //     }
 
-            // تحقق من توفر مقعد في الكلاس الجديد
-            boolean canChange = false;
+    //     System.out.println("Do you want to change the date/time? (yes/no)");
+    //     String changeTime = scanner.nextLine().trim().toLowerCase();
+    //     if (changeTime.equals("yes")) {
+    //         try {
+    //             System.out.print("Enter new departure time (yyyy-MM-dd HH:mm): ");
+    //             String dep = scanner.nextLine();
+    //             System.out.print("Enter new arrival time (yyyy-MM-dd HH:mm): ");
+    //             String arr = scanner.nextLine();
 
-            if (newClass.equals("economy") && flight.getAvailableEconomySeats() > 0) {
-                flight.setAvailableEconomySeats(flight.getAvailableEconomySeats() - 1);
-                canChange = true;
-            } else if (newClass.equals("business") && flight.getAvailableBusinessSeats() > 0) {
-                flight.setAvailableBusinessSeats(flight.getAvailableBusinessSeats() - 1);
-                canChange = true;
-            } else if (newClass.equals("first") && flight.getAvailableFirstClassSeats() > 0) {
-                flight.setAvailableFirstClassSeats(flight.getAvailableFirstClassSeats() - 1);
-                canChange = true;
-            }
+    //             flight.setDepartureTime(LocalDateTime.parse(dep));
+    //             flight.setArrivalTime(LocalDateTime.parse(arr));
+    //             System.out.println("✅ Schedule updated.");
+    //         } catch (Exception e) {
+    //             System.out.println("❌ Invalid date format.");
+    //             return;
+    //         }
+    //     }
 
-            if (canChange) {
-                // استرجاع المقعد من الكلاس القديم
-                if (oldClass.equals("economy")) {
-                    flight.setAvailableEconomySeats(flight.getAvailableEconomySeats() + 1);
-                } else if (oldClass.equals("business")) {
-                    flight.setAvailableBusinessSeats(flight.getAvailableBusinessSeats() + 1);
-                } else if (oldClass.equals("first")) {
-                    flight.setAvailableFirstClassSeats(flight.getAvailableFirstClassSeats() + 1);
-                }
+    //     System.out.println("Do you want to change seat class? (yes/no)");
+    //     String changeClass = scanner.nextLine().trim().toLowerCase();
+    //     if (changeClass.equals("yes")) {
+    //         System.out.print("Enter your current seat class (economy/business/first): ");
+    //         String oldClass = scanner.nextLine().trim().toLowerCase();
 
-                System.out.println("✅ Seat class changed successfully.");
-            } else {
-                System.out.println("❌ No available seats in new class.");
-            }
-        } else {
-            System.out.println("⏳ Keeping the same seat class.");
-        }
+    //         System.out.print("Enter new seat class (economy/business/first): ");
+    //         String newClass = scanner.nextLine().trim().toLowerCase();
 
-        // تحديث الرحلة في الملف (لو عندك الدالة دي)
-        // updateFlightInFile(flight);
-    }
+    //         // تحقق من توفر مقعد في الكلاس الجديد
+    //         boolean canChange = false;
+
+    //         if (newClass.equals("economy") && flight.getAvailableEconomySeats() > 0) {
+    //             flight.setAvailableEconomySeats(flight.getAvailableEconomySeats() - 1);
+    //             canChange = true;
+    //         } else if (newClass.equals("business") && flight.getAvailableBusinessSeats() > 0) {
+    //             flight.setAvailableBusinessSeats(flight.getAvailableBusinessSeats() - 1);
+    //             canChange = true;
+    //         } else if (newClass.equals("first") && flight.getAvailableFirstClassSeats() > 0) {
+    //             flight.setAvailableFirstClassSeats(flight.getAvailableFirstClassSeats() - 1);
+    //             canChange = true;
+    //         }
+
+    //         if (canChange) {
+    //             // استرجاع المقعد من الكلاس القديم
+    //             if (oldClass.equals("economy")) {
+    //                 flight.setAvailableEconomySeats(flight.getAvailableEconomySeats() + 1);
+    //             } else if (oldClass.equals("business")) {
+    //                 flight.setAvailableBusinessSeats(flight.getAvailableBusinessSeats() + 1);
+    //             } else if (oldClass.equals("first")) {
+    //                 flight.setAvailableFirstClassSeats(flight.getAvailableFirstClassSeats() + 1);
+    //             }
+
+    //             System.out.println("✅ Seat class changed successfully.");
+    //         } else {
+    //             System.out.println("❌ No available seats in new class.");
+    //         }
+    //     } else {
+    //         System.out.println("⏳ Keeping the same seat class.");
+    //     }
+
+    //     // تحديث الرحلة في الملف (لو عندك الدالة دي)
+    //     // updateFlightInFile(flight);
+    // }
 
     public void generateReports () {
         System.out.println("---- Generate Report Menu ----");

@@ -14,7 +14,7 @@ import shared.SecurityLevel;
 import shared.UserStatus;
 
 public class FileManager {
-    private static final String BASE = "storage/";
+    private static final String BASE = "../storage/";
 
     private static final String ADMIN_FILE = BASE + "administrators.txt";
     private static final String AGENT_FILE = BASE + "agents.txt";
@@ -72,7 +72,7 @@ public class FileManager {
                 String name = data[5];
                 String email = data[6];
                 String contact = data[7];
-                UserStatus status = UserStatus.valueOf(data[9]);
+                UserStatus status = UserStatus.valueOf(data[8]);
 
                 admins.add(new Administrator(adminId, securityLevel, userId, username, password, name, email, contact, status));
             }
@@ -130,7 +130,7 @@ public class FileManager {
                 String name = data[6];
                 String email = data[7];
                 String contactInfo = data[8];
-                UserStatus status = UserStatus.valueOf(data[10]);
+                UserStatus status = UserStatus.valueOf(data[9]);
 
                 agents.add(new Agent(agentId, depart, commision, userId,  username,  password,  name,  email,  contactInfo, status));
             }
@@ -187,7 +187,7 @@ public class FileManager {
                 String name = data[6];
                 String email = data[7];
                 String contactInfo = data[8];
-                UserStatus status = UserStatus.valueOf(data[10]);
+                UserStatus status = UserStatus.valueOf(data[9]);
 
                 customers.add(new Customer(customerId, address, preferance, userId,  username,  password,  name,  email,  contactInfo, status, null));
             }
