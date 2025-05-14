@@ -8,7 +8,6 @@ import eg.alex.fcds.models.payment.*;
 import java.time.LocalDateTime;
 
 public class BookingSystem {
-    private List<Flight> flights;
     private List<Administrator> admins;
     private List<Agent> agents;
     private List<Customer> customers;
@@ -20,8 +19,8 @@ public class BookingSystem {
     private Scanner scanner = new Scanner(System.in);
 
     private User currentUser;
-    
-    private static BookingSystem instance;
+    private static final BookingSystem INSTANCE = new BookingSystem();
+
     public List<Flight> getAllFlights() {
         return flights;
     }
@@ -68,10 +67,7 @@ public class BookingSystem {
     }
 
     public static BookingSystem getInstance() {
-        if (instance == null) {
-            instance = new BookingSystem();
-        }
-        return instance;
+        return INSTANCE;
     }
 
     public void login() {
