@@ -5,7 +5,7 @@ public class Main {
         BookingSystem app = null;
 
         try {
-			app = BookingSystem.getInstance();
+			app = new BookingSystem();
 		} catch (Exception ex) { }
 
 

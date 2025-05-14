@@ -192,7 +192,7 @@ public class Agent extends User {
                 availableBusinessSeats, bookedBusinessSeats, businessPrice,
                 availableFirstClassSeats, bookedFirstClassSeats, firstClassPrice);
 
-        BookingSystem.getInstance().saveFlight(flight);
+        this.app.saveFlight(flight);
     }
 
     public void editFlight() throws OperationsException{
@@ -200,7 +200,7 @@ public class Agent extends User {
         System.out.print("Enter flight number to edit: ");
         String flightNumber = scanner.nextLine();
 
-        Flight flight = BookingSystem.getInstance().getFlightByNumber(flightNumber);
+        Flight flight = this.app.getFlightByNumber(flightNumber);
         if (flight == null) {
             System.out.println("No flight found with this flight number.");
             this.showMenu();
@@ -306,7 +306,7 @@ public class Agent extends User {
         }
         
         flight.update(newDepTime, newArrTime, eprice, eavailability, bprice, bavailability, fprice, favailability);
-        BookingSystem.getInstance().updateFlight();
+        this.app.updateFlight();
     }
 
     public void removeFlight() throws OperationsException {
@@ -314,18 +314,18 @@ public class Agent extends User {
         System.out.print("Enter flight number to edit: ");
         String flightNumber = scanner.nextLine();
 
-        Flight flight = BookingSystem.getInstance().getFlightByNumber(flightNumber);
+        Flight flight = this.app.getFlightByNumber(flightNumber);
         if (flight == null) {
             System.out.println("No flight found with this flight number.");
             
             this.showMenu();
         }
         
-        BookingSystem.getInstance().removeFlight(flightNumber);
+        this.app.removeFlight(flightNumber);
     }
 
     public void viewFlights() {
-        BookingSystem.getInstance().printFlights();
+        this.app.printFlights();
     }
 
 

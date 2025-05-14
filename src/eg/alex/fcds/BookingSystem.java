@@ -19,13 +19,12 @@ public class BookingSystem {
     private Scanner scanner = new Scanner(System.in);
 
     private User currentUser;
-    private static final BookingSystem INSTANCE = new BookingSystem();
 
     public List<Flight> getAllFlights() {
         return flights;
     }
 
-    private BookingSystem() {
+    public BookingSystem() {
         admins = FileManager.loadAdmins();
         agents = FileManager.loadAgents();
         customers = FileManager.loadCustomers();
@@ -66,10 +65,6 @@ public class BookingSystem {
         this.login();
     }
 
-    public static BookingSystem getInstance() {
-        return INSTANCE;
-    }
-
     public void login() {
         System.out.println("=== User Login ===");
         System.out.print("Please enter your username: ");
@@ -104,7 +99,8 @@ public class BookingSystem {
         } else {
             currentUser = user;
             while(true) {
-                user.showMenu();
+                currentUser.initiate(this);
+                currentUser.showMenu();
             }
         }
     }

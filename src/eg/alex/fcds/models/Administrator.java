@@ -112,7 +112,7 @@ public class Administrator extends User {
         String contactInfo = userInfo.get(4);
 
         Administrator administrator = new Administrator(level, username, password, name, email, contactInfo);
-        BookingSystem.getInstance().saveAdminstrator(administrator);
+        this.app.saveAdminstrator(administrator);
     }
 
     private void CreateAgent(List<String> userInfo) {
@@ -126,7 +126,7 @@ public class Administrator extends User {
         double commision = Double.parseDouble(responses.get(1));
 
         Agent agent = new Agent(username, password, name, email, contactInfo, department, commision);
-        BookingSystem.getInstance().saveAgent(agent);
+        this.app.saveAgent(agent);
     }
 
     private void CreateCustomer(List<String> userInfo) {
@@ -140,7 +140,7 @@ public class Administrator extends User {
         String prefernces = responses.get(1);
 
         Customer customer = new Customer(username, password, name, email, contactInfo, address, prefernces);
-        BookingSystem.getInstance().saveCustomer(customer);
+        this.app.saveCustomer(customer);
     }
 
     public void viewSystemLogs() {
@@ -167,9 +167,7 @@ public class Administrator extends User {
     }
 
     public void manageUserAccess(String username, boolean activate) throws InvalidRoleValueException {
-        BookingSystem system = BookingSystem.getInstance();
-        
-        User user = system.searchUser(username);
+        User user = this.app.searchUser(username);
         if (user == null || user.getRole() == Role.ADMINSTRITOR)
             throw new InvalidRoleValueException("You tried to change a user with administrator role");
 
@@ -179,7 +177,7 @@ public class Administrator extends User {
             user.deActivate();
         }
 
-        system.updateUsers(user.getRole());
+        this.app.updateUsers(user.getRole());
     }
 
     @Override
