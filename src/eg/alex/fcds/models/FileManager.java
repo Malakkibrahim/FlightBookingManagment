@@ -15,7 +15,7 @@ import eg.alex.fcds.models.shared.SecurityLevel;
 import eg.alex.fcds.models.shared.UserStatus;
 
 public class FileManager {
-    private static final String BASE = "../storage/";
+    private static final String BASE = "/Users/Kamal/WorkSpace/FlightBookingManagment/storage/";
 
     private static final String ADMIN_FILE = BASE + "administrators.txt";
     private static final String AGENT_FILE = BASE + "agents.txt";

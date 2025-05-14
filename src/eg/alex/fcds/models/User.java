@@ -89,7 +89,7 @@ public abstract class User {
             System.out.println("❌ Invalid input. Please type 'yes' or 'no'.");
             logout();
         }
-        scanner.close();
+        
     }
 
     public void updateprofile(String username, String password, String name, String email, String contactinfo) {

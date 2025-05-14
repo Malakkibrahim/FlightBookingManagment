@@ -172,7 +172,7 @@ public class Agent extends User {
         System.out.print("Enter First Class seat price: ");
         double firstClassPrice = scanner.nextDouble();
 
-        scanner.close();
+        
 
         System.out.println("\n=== Flight Data Summary ===");
         System.out.printf("%-18s: %s%n", "Airline", airline);
@@ -304,7 +304,7 @@ public class Agent extends User {
                 System.out.println("Please enter a valid number");
             } 
         }
-        scanner.close();
+        
         flight.update(newDepTime, newArrTime, eprice, eavailability, bprice, bavailability, fprice, favailability);
         BookingSystem.getInstance().updateFlight();
     }
@@ -317,10 +317,10 @@ public class Agent extends User {
         Flight flight = BookingSystem.getInstance().getFlightByNumber(flightNumber);
         if (flight == null) {
             System.out.println("No flight found with this flight number.");
-            scanner.close();
+            
             this.showMenu();
         }
-        scanner.close();
+        
         BookingSystem.getInstance().removeFlight(flightNumber);
     }
 

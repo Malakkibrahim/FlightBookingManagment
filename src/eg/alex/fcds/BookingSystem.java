@@ -103,7 +103,9 @@ public class BookingSystem {
             login();
         } else {
             currentUser = user;
-            user.showMenu();
+            while(true) {
+                user.showMenu();
+            }
         }
     }
 
@@ -200,7 +202,7 @@ public class BookingSystem {
 
             default:
                 System.out.println("Invalid choice. Exiting.");
-                scanner.close();
+                
                 return;
         }
 
@@ -213,7 +215,7 @@ public class BookingSystem {
         else
             System.out.println("Booking not connfiirmed due to failed payment transaction");
 
-        scanner.close();
+        
     }
 
     public void generateTicket(Booking booking, Payment payment) {

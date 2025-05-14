@@ -74,14 +74,10 @@ public class Administrator extends User {
                 } catch(Exception e) {
                     Console.printInline(e.getMessage());
                 }
-
                 break;
-
             default:
                 System.out.println("Invalid choice. Please try again.");
         }
-
-        System.out.println();
     }
 
     /*
@@ -106,17 +102,8 @@ public class Administrator extends User {
     }
 
     private void CreateAdminstrator(List<String> userInfo) {
-        Console.displayMenu("Adminstrator Security Levels", List.of("high", "meduim", "low"));
-        SecurityLevel level = null;
-        while (level == null) {
-            String securityLevel = Console.displayForm("Enter Adminstrator Info", List.of("security level")).get(0)
-                    .trim().toUpperCase();
-            try {
-                level = SecurityLevel.valueOf(securityLevel);
-            } catch (IllegalArgumentException e) {
-                System.out.println("Invalid security level entered. Try again!");
-            }
-        }
+        int choice = Console.displayMenu("Adminstrator Security Levels", List.of("high", "meduim", "low"));;
+        SecurityLevel level = choice == 1 ? SecurityLevel.HIGH : choice == 2 ? SecurityLevel.MEDUIM : SecurityLevel.LOW;
 
         String username = userInfo.get(0);
         String password = userInfo.get(1);
@@ -175,7 +162,7 @@ public class Administrator extends User {
             }
             input = scanner.nextLine();
         } 
-        scanner.close();
+        
         FileManager.updateSystemSettings(settings);
     }
 

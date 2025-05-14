@@ -6,6 +6,8 @@ public class Main {
 
         try {
 			app = BookingSystem.getInstance();
-		} catch (Exception ex) { }
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
     }
 }
