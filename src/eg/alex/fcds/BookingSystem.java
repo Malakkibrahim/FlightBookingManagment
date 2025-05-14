@@ -8,6 +8,7 @@ import eg.alex.fcds.models.payment.*;
 import java.time.LocalDateTime;
 
 public class BookingSystem {
+    private List<Flight> flights;
     private List<Administrator> admins;
     private List<Agent> agents;
     private List<Customer> customers;
@@ -21,6 +22,9 @@ public class BookingSystem {
     private User currentUser;
     
     private static BookingSystem instance;
+    public List<Flight> getAllFlights() {
+        return flights;
+    }
 
     private BookingSystem() {
         admins = FileManager.loadAdmins();

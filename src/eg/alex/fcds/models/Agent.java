@@ -54,7 +54,7 @@ public class Agent extends User {
 
     @Override
     public void showMenu() {
-        List<String> mainMenu = new ArrayList<>() {
+        List<String> mainMenu = new ArrayList<>() { 
             {
                 add("Manage Flights");
                 add("Create Booking for Customer");
@@ -68,7 +68,7 @@ public class Agent extends User {
             case 1:
                 this.manageFlights();
                 break;
-        
+
             default:
                 break;
         }
@@ -328,13 +328,6 @@ public class Agent extends User {
         BookingSystem.getInstance().printFlights();
     }
 
-    public void generateReports() {
-        System.out.println("---- Generate Report Menu ----");
-        System.out.println("1. View All Flights");
-        System.out.println("2. View Booked Seats");
-        System.out.println("3. View Available Seats");
-        System.out.println("4. Back to Main Menu");
-    }
 
     @Override
     public String toString() {

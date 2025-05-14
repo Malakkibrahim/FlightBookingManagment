@@ -7,5 +7,8 @@ public class Main {
         try {
 			app = BookingSystem.getInstance();
 		} catch (Exception ex) { }
+
+
+        // Administrator admin  = new Administrator();
     }
 }
